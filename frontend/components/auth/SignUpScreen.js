@@ -7,8 +7,7 @@ import { useSignUp } from "@clerk/clerk-expo";
 export default function SignUpScreen() {
     const { isLoaded, signUp, setActive } = useSignUp();
 
-    const [firstName, setFirstName] = React.useState("");
-    const [lastName, setLastName] = React.useState("");
+    const [username, setUserName] = React.useState("");
     const [emailAddress, setEmailAddress] = React.useState("");
     const [password, setPassword] = React.useState("");
     const [pendingVerification, setPendingVerification] = React.useState(false);
@@ -22,8 +21,7 @@ export default function SignUpScreen() {
 
         try {
             await signUp.create({
-                // firstName,
-                // lastName,
+                username,
                 emailAddress,
                 password,
             });
@@ -65,18 +63,12 @@ export default function SignUpScreen() {
                 <>
                     <TextInput
                         autoCapitalize="none"
-                        value={firstName}
-                        placeholder="First Name..."
-                        onChangeText={(firstName) => setFirstName(firstName)}
+                        value={username}
+                        placeholder="User Name..."
+                        onChangeText={(username) => setUserName(username)}
                         style={styles.textInput}
                     />
-                    <TextInput
-                        autoCapitalize="none"
-                        value={lastName}
-                        placeholder="Last Name..."
-                        onChangeText={(lastName) => setLastName(lastName)}
-                        style={styles.textInput}
-                    />
+                    
                     <TextInput
                         autoCapitalize="none"
                         value={emailAddress}
@@ -115,12 +107,13 @@ export default function SignUpScreen() {
                         onPress={onPressVerify}
                         style={styles.signInButton}
                     >
-                        <Text style={styles.signInButton}>Verify Email</Text>
+                        <Text style={styles.signInText}>Verify Email</Text>
                     </TouchableOpacity>
                 </>
             )}
         </View>
     );
+    
 }
 
 const styles = StyleSheet.create({

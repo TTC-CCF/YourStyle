@@ -40,7 +40,7 @@ export default function SignInScreen({ navigation }) {
 			<TextInput
 				autoCapitalize="none"
 				value={emailAddress}
-				placeholder="Email..."
+				placeholder="Email or User Name..."
 				onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
 				style={styles.textInput}
 			/>
