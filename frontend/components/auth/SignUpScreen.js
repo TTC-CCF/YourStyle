@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Text, TextInput, TouchableOpacity, View, StyleSheet } from "react-native";
 import { useSignUp } from "@clerk/clerk-expo";
-
-// import SignInWithOAuth from "../components/auth/SignInWithOAuth";
+import UserModel from "../../models/UserModel";
+import SignInWithOAuth from "./SignInWithOAuth";
 
 export default function SignUpScreen() {
     const { isLoaded, signUp, setActive } = useSignUp();
@@ -12,6 +12,7 @@ export default function SignUpScreen() {
     const [password, setPassword] = React.useState("");
     const [pendingVerification, setPendingVerification] = React.useState(false);
     const [code, setCode] = React.useState("");
+    const [error, setError] = React.useState("");
 
     // start the sign up process.
     const onSignUpPress = async () => {
@@ -25,7 +26,7 @@ export default function SignUpScreen() {
                 emailAddress,
                 password,
             });
-
+            
             // send the email.
             await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
 
@@ -33,6 +34,7 @@ export default function SignUpScreen() {
             setPendingVerification(true);
         } catch (err) {
             console.error(JSON.stringify(err, null, 2));
+            setError(err.errors[0].longMessage);
         }
     };
 
@@ -46,10 +48,14 @@ export default function SignUpScreen() {
             const completeSignUp = await signUp.attemptEmailAddressVerification({
                 code,
             });
+            console.log(JSON.stringify(completeSignUp, null, 2));
+
+            await UserModel.createUser(username, emailAddress, completeSignUp.createdUserId);
 
             await setActive({ session: completeSignUp.createdSessionId });
         } catch (err) {
             console.error(JSON.stringify(err, null, 2));
+            setError(err.errors[0].longMessage);
         }
     };
 
@@ -58,7 +64,8 @@ export default function SignUpScreen() {
             <Text style={styles.title}>
                 YourStyle
             </Text>
-            <Text style={styles.infoText}>Sign up account</Text>
+            {error === "" && <Text style={styles.infoText}>Sign up account</Text>}
+            {error !== "" && <Text style={styles.errText}>{error}</Text>}
             {!pendingVerification && (
                 <>
                     <TextInput
@@ -93,6 +100,7 @@ export default function SignUpScreen() {
                     >
                         <Text style={styles.signInText}>Sign up</Text>
                     </TouchableOpacity>
+                    <SignInWithOAuth />
                 </>
             )}
             {pendingVerification && (
@@ -117,6 +125,11 @@ export default function SignUpScreen() {
 }
 
 const styles = StyleSheet.create({
+    errText: {
+        color: "#f00",
+        textAlign: "center",
+        fontSize: 16,
+    },
     title: {
         color: "#000",
         textAlign: "center",

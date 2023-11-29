@@ -1,5 +1,5 @@
 import { Text, View, StyleSheet, Button } from "react-native";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth } from "@clerk/clerk-expo";
 
 const SignOut = () => {
     const { isLoaded, signOut } = useAuth();

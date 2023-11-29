@@ -8,9 +8,15 @@ export default function SignInScreen({ navigation }) {
 
 	const [emailAddress, setEmailAddress] = React.useState("");
 	const [password, setPassword] = React.useState("");
+    const [error, setError] = React.useState("");
 
 	const onSignInPress = async () => {
 		if (!isLoaded) {
+			return;
+		}
+
+		if (emailAddress === "" || password === "") {
+			setError("Please enter your email address and password");
 			return;
 		}
 
@@ -23,7 +29,8 @@ export default function SignInScreen({ navigation }) {
 			// This indicates the user is signed in
 			await setActive({ session: completeSignIn.createdSessionId });
 		} catch (err) {
-			console.log(err);
+			console.log(JSON.stringify(err, null, 2));
+			setError(err.errors[0].message)
 		}
 	};
 
@@ -33,9 +40,8 @@ export default function SignInScreen({ navigation }) {
 				YourStyle
 			</Text>
 
-			<Text style={styles.infoText}>
-				Please sign in to continue
-			</Text>
+			{error === "" && <Text style={styles.infoText}>Please sign in to continue</Text>}
+            {error !== "" && <Text style={styles.errText}>{error}</Text>}
 
 			<TextInput
 				autoCapitalize="none"
@@ -75,6 +81,11 @@ export default function SignInScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+	errText: {
+        color: "#f00",
+        textAlign: "center",
+        fontSize: 16,
+    },
 	title: {
 		color: "#000",
 		textAlign: "center",

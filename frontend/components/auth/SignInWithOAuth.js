@@ -1,8 +1,9 @@
 import React from "react";
 import * as WebBrowser from "expo-web-browser";
 import { Button } from "react-native";
-import { useOAuth } from "@clerk/clerk-expo";
+import { useOAuth, useAuth } from "@clerk/clerk-expo";
 import { useWarmUpBrowser } from "../../hooks/warmUpBrowser";
+import UserModel from "../../models/UserModel";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -23,8 +24,17 @@ const SignInWithOAuth = () => {
             } else {
                 // Use signIn or signUp for next steps such as MFA
             }
+
+            if (signUp && signUp.createdUserId) {
+                await UserModel.createUser(
+                    `${signUp.firstName} ${signUp.lastName}`,
+                    signUp.emailAddress,
+                    signUp.createdUserId
+                );
+            }
+            
         } catch (err) {
-            console.error("OAuth error", err);
+            console.error(JSON.stringify(err, null, 2));
         }
     }, []);
 
