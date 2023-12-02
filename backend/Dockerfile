@@ -1,17 +1,13 @@
-# Use a base image
 FROM node:20.9.0
 
-# Set the working directory
-WORKDIR /app
+ENV APP_HOME /app
 
-# Copy the source code to the working directory
-COPY . .
+WORKDIR $APP_HOME
 
-# Install dependencies (if any)
+COPY . ./
+
 RUN npm install
 
-# Expose a port (if needed)
 EXPOSE 3000
 
-# Define the command to run the application
 CMD ["npm", "start"]
