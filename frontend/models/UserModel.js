@@ -36,7 +36,6 @@ export default class UserModel {
             }
         )
         const data = await response.json();
-        console.log(data);
         return data;
     }
 }

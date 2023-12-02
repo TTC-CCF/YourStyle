@@ -1,16 +1,20 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from "@react-navigation/native";
 import Homepage from "../components/home/Homepage";
+import Feeds from '../components/home/Feeds';
+import Post from '../components/home/Post';
 
 export default function LoginNavigator() {
-    const Stack = createNativeStackNavigator();
+    const Tab = createBottomTabNavigator();
     return (
         <NavigationContainer>
-        <Stack.Navigator
+        <Tab.Navigator
             initialRouteName="Homepage"
         >
-            <Stack.Screen name="Home" component={Homepage} />
-        </Stack.Navigator>
+            <Tab.Screen name="Home" component={Homepage} />
+            <Tab.Screen name="Feeds" component={Feeds} />
+            <Tab.Screen name="New" component={Post} />
+        </Tab.Navigator>
         </NavigationContainer>
     );
 }

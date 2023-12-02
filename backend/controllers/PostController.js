@@ -1,4 +1,4 @@
-import PostModel from '../models/PostModel.js';
+import Post from '../models/PostModel.js';
 import multer from "multer";
 import { RemoveS3Images, uploadImageToS3 } from '../services/s3.js'
 import fs from 'fs';
@@ -25,7 +25,7 @@ export default class PostController {
                 RemoveImage(req.file);
             }
 
-            const post = await PostModel.createPost(req.body.title, req.body.description, req.body.user_id, req.body.tags, image_url);
+            const post = await Post.createPost(req.body.title, req.body.description, req.body.user_id, req.body.tags, image_url);
             res.status(200).json(post);
 
         } catch (err) {
@@ -37,7 +37,7 @@ export default class PostController {
 
     async ListPosts(req, res) {
         try {
-            const posts = await PostModel.findAll();
+            const posts = await Post.findAll();
             console.log(posts);
             res.status(200).json(posts);
 

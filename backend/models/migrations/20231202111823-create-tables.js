@@ -56,8 +56,8 @@ module.exports = {
           defaultValue: 0,
           allowNull: false,
       },
-      created_at: Sequelize.DATE,
-      updated_at: Sequelize.DATE,
+      createdAt: Sequelize.DATE,
+      updatedAt: Sequelize.DATE,
     });
     await queryInterface.createTable('tag', {
       id: {
@@ -112,11 +112,9 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
+    await queryInterface.dropTable('tag');
+    await queryInterface.dropTable('user_post_score');
+    await queryInterface.dropTable('post');
+    await queryInterface.dropTable('user');
   }
 };
