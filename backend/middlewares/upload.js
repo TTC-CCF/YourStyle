@@ -2,7 +2,7 @@ import multer from "multer";
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, process.env.IMAGE_PATH)
+        cb(null, '.')
     },
     filename: function (req, file, cb) {
         let extArray = file.mimetype.split("/");

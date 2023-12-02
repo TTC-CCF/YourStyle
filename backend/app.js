@@ -3,7 +3,7 @@ import UserRouter from "./routers/UserRouter.js";
 import PostRouter from "./routers/PostRouter.js";
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({ path: "./secret/.env" });
 
 let app = express();
 

@@ -1,8 +1,6 @@
 FROM node:20.9.0
 
-ENV APP_HOME /app
-
-WORKDIR $APP_HOME
+WORKDIR /app
 
 COPY . ./
 
