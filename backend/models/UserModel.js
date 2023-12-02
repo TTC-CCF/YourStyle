@@ -1,5 +1,7 @@
 import sequelize_pool from "./config.js"
 import { DataTypes, Model } from "sequelize"
+import UserPostScore from "./UserPostScoreModel.js";
+import Post from "./PostModel.js";
 
 export default class User extends Model {
     static async createUser(username, email, id) {
@@ -11,6 +13,10 @@ export default class User extends Model {
                 email: email,
                 role: 'user',
             });
+
+            let posts = await Post.findAll({attributes: ['id']});
+            posts = posts.map(post => post.dataValues.id);
+            await UserPostScore.initNewUserScore(user.id, posts);
 
             await transaction.commit();
 
@@ -33,7 +39,6 @@ User.init(
         username: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: true,
         },
         email: {
             type: DataTypes.STRING,

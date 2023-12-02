@@ -1,6 +1,6 @@
 node_modules
+mock
 __pycache__
 ai
-*.npy
-.env
-config.json
+
+mock

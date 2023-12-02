@@ -1,4 +1,3 @@
-import epress from 'express'
 import User from '../models/UserModel.js'
 
 export default class UserController {

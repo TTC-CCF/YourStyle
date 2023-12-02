@@ -1,5 +1,6 @@
 import express from "express";
 import UserRouter from "./routers/UserRouter.js";
+import PostRouter from "./routers/PostRouter.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -13,6 +14,7 @@ app.get("/healthcheck", (req, res) => {
 });
 
 app.use(`/api/${process.env.API_VERSION}/user`, UserRouter);
+app.use(`/api/${process.env.API_VERSION}/post`, PostRouter);
 
 app.listen(3000, () => {
     console.log("Listening on port 3000");
