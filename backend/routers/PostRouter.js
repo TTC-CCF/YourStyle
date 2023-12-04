@@ -7,6 +7,7 @@ const router = express.Router();
 const postController = new PostController();
 
 router.post("/create",ClerkExpressRequireAuth({ secretKey: process.env.CLERK_SECRET_KEY, authorizedParties: ['*']}), upload.single("image"), postController.CreatePost, handleUploadError);
-router.get("/list", postController.ListPosts);
+router.get("/list/:id", postController.ListPosts);
+router.put("/click", postController.ClickPost);
 
 export default router;
