@@ -1,4 +1,4 @@
-import { PutObjectCommand, DeleteObjectsCommand, S3Client } from '@aws-sdk/client-s3';
+import { PutObjectCommand, DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import fs from 'fs';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -11,19 +11,23 @@ const S3params = {
     }
 };
 
-async function RemoveS3Images(image_keys) {
-    if (image_keys === undefined || image_keys.length === 0) return;
+function getImageKey(url) {
+    let url_split = url.split('/');
+    return `${process.env.AWS_S3_KEY}/${url_split[url_split.length - 1]}`;
+}
 
+async function RemoveS3Images(image_key) {
+    if (image_key === undefined ) return;
+    console.log(image_key)
     const s3Client = new S3Client(S3params);
     const params = {
         Bucket: process.env.AWS_BUCKET_NAME,
-        Delete: {
-          Objects: image_keys.map((Key) => ({ Key })),
-        },
+        Key: image_key
       };
-    const command = new DeleteObjectsCommand(params);
+    const command = new DeleteObjectCommand(params);
     const response = await s3Client.send(command);
-    if (response.$metadata.httpStatusCode !== 200) {
+
+    if (response.$metadata.httpStatusCode !== 204) {
         console.log(response);
         throw new Error();
     }
@@ -49,4 +53,4 @@ async function uploadImageToS3(file) {
     return `${process.env.AWS_CDN_URL}/${process.env.AWS_S3_KEY}/${file.filename}`
 }
 
-export { RemoveS3Images, uploadImageToS3 };
+export { RemoveS3Images, uploadImageToS3, getImageKey };

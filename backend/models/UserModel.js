@@ -37,7 +37,6 @@ export default class User extends Model {
                 }, 
                 attributes: ['latest_clicked_posts']
             });
-            console.log(latestClickedPosts);
             return latestClickedPosts.dataValues.latest_clicked_posts;
         } catch (error) {
             console.error('Error getting latest clicked posts:', error);
@@ -56,10 +55,36 @@ export default class User extends Model {
                 }
             });
 
+            await UserPostScore.update({
+                score: sequelize_pool.literal('score + 1'),
+            }, {
+                where: {
+                    user_id: userId,
+                    post_id: postId,
+                }
+            
+            })
+
             await transaction.commit();
         } catch (error) {
             console.error('Error updating latest clicked posts:', error);
             await transaction.rollback();
+            throw error;
+        }
+    }
+
+    static async setDeletedPost(postId) {
+        try {
+            await User.update({
+                latest_clicked_posts: null,
+            }, {
+                where: {
+                    latest_clicked_posts: postId,
+                }
+            });
+
+        } catch (error) {
+            console.error('Error setting deleted post:', error);
             throw error;
         }
     }

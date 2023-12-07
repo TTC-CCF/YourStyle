@@ -1,8 +1,9 @@
-export default class Post {
-    static async listPosts() {
+export default class PostModel {
+    static async listPosts(userId, nextPage) {
         try {
-            let response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/post/list`);
+            let response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/post/list/${userId}?page=${nextPage}`);
             let json = await response.json();
+            if (json.data === undefined) json = {data: []};
             return json;
         } catch (error) {
             console.error(error);
@@ -42,4 +43,82 @@ export default class Post {
             console.error(error);
         }
     }
+
+    static async clickPost(postId, userId) {
+        try {
+            let response = await fetch(
+                `${process.env.EXPO_PUBLIC_ENDPOINT}/post/click`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        postId,
+                        userId,
+                    }),
+                }
+            );
+            let json = await response.json();
+            console.log(json);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    static async getPost(postId) {
+        try {
+            let response = await fetch (`${process.env.EXPO_PUBLIC_ENDPOINT}/post/${postId}`)
+            let json = await response.json();
+            console.log(json);
+            return json;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    static async deletePost(postId, token) {
+        try {
+            let response = await fetch(
+                `${process.env.EXPO_PUBLIC_ENDPOINT}/post/${postId}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    },
+                }
+            );
+            let json = await response.json();
+            console.log(json);
+            return json;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    static async getRecommendation(userId) {
+        try {
+            let response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/post/maybelike/${userId}`);
+            let json = await response.json();
+            console.log(json.data)
+            if (json.data === undefined) json = {data: []};
+            return json;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    static async searchPosts(keyword) {
+        try {
+            let response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/post/search?keyword=${keyword}`);
+            let json = await response.json();
+            if (json.data === undefined) json = {data: []};
+            return json;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
 }
+

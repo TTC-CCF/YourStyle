@@ -1,5 +1,3 @@
-
-
 export default class UserModel {
     static createUser = async (username, email, id) => {
         console.log(username, email, id);

@@ -1,7 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
-import SignInScreen from "../components/auth/SignInScreen";
-import SignUpScreen from "../components/auth/SignUpScreen";
+import SignInScreen from "../pages/auth/SignInScreen";
+import SignUpScreen from "../pages/auth/SignUpScreen";
+import ClosetPage from "../pages/home/ClosetPage";
 
 export default function LoginNavigator() {
     const Stack = createNativeStackNavigator();
@@ -15,6 +16,7 @@ export default function LoginNavigator() {
         >
             <Stack.Screen name="SignIn" component={SignInScreen} />
             <Stack.Screen name="SignUp" component={SignUpScreen} />
+            <Stack.Screen name="Closet" component={ClosetPage} />
         </Stack.Navigator>
         </NavigationContainer>
     );

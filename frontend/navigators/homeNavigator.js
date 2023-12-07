@@ -1,20 +1,30 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from "@react-navigation/native";
-import Homepage from "../components/home/Homepage";
-import Feeds from '../components/home/Feeds';
-import Post from '../components/home/Post';
+import FooterNavigator from './footerNavigator';
+import PostDetailPage from '../pages/home/PostDetailPage';
 
-export default function LoginNavigator() {
-    const Tab = createBottomTabNavigator();
+export default function HomeNavigator() {
+    const Stack = createNativeStackNavigator();
     return (
         <NavigationContainer>
-        <Tab.Navigator
-            initialRouteName="Homepage"
+        <Stack.Navigator
+            initialRouteName="Home"
+            screenOptions={{
+                headerShown: false,
+            }}
+            id='homeNavigator'
         >
-            <Tab.Screen name="Home" component={Homepage} />
-            <Tab.Screen name="Feeds" component={Feeds} />
-            <Tab.Screen name="New" component={Post} />
-        </Tab.Navigator>
+            <Stack.Screen name="Footer" component={FooterNavigator} />
+            <Stack.Screen 
+            name="PostDetail" 
+            component={PostDetailPage} 
+            options={({ route }) => ({
+                headerShown: true, 
+                headerTitle: route.params.post.title
+            })}>
+            </Stack.Screen>
+        </Stack.Navigator>
+        
         </NavigationContainer>
     );
 }

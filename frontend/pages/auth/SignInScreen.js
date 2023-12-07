@@ -75,6 +75,14 @@ export default function SignInScreen({ navigation }) {
 				onPress={() => navigation.navigate("SignUp")}
 			/>
 			<SignInWithOAuth />
+
+			<Text style={styles.infoText}>Or, you can just use e-Closet</Text>
+			<TouchableOpacity
+				onPress={() => navigation.navigate("Closet")}
+				style={styles.signInButton}
+			>
+				<Text style={styles.signInText}>e-Closet</Text>
+			</TouchableOpacity>
 			
 		</View>
 	);

@@ -1,5 +1,7 @@
 import sequelize_pool from "./config.js";
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model, Sequelize, SequelizeScopeError } from "sequelize";
+import Post from "./PostModel.js"
+import Tag from "./TagModel.js";
 
 export default class UserPostScore extends Model {
     static async initNewUserScore(user_id, post_ids) {
@@ -43,7 +45,7 @@ export default class UserPostScore extends Model {
         const transaction = await sequelize_pool.transaction();
         try {
             await UserPostScore.update({
-                score: score,
+                score: sequelize.literal(`score + ${score}`),
             }, {
                 where: {
                     user_id: user_id,
@@ -54,6 +56,46 @@ export default class UserPostScore extends Model {
         } catch (err) {
             console.error('Error updating score:', err);
             await transaction.rollback();
+            throw err;
+        }
+    }
+
+    static async maybeLikePosts(similar_users) {
+        try {
+            const result = await UserPostScore.findAll({
+                where: {
+                    user_id: similar_users,
+                    score: {
+                        [Sequelize.Op.gt]: 0,
+                    },
+                },
+            });
+
+            let post_score = [];
+            for (const user of similar_users) {
+                let data = result.filter(userPostScore => userPostScore.dataValues.user_id === user);
+                if (data.length > 0 ) {
+                    let sorted_score = data.sort((a, b) => b.dataValues.score - a.dataValues.score);
+                    sorted_score = sorted_score.map(post => ({postId: post.dataValues.post_id, score: post.dataValues.score}));
+                    post_score.push(...sorted_score);
+                }
+            }
+
+            const recommendPosts = await Post.findAll({
+                where: {
+                    id: post_score.map(post => post.postId),
+                },
+                include: [{
+                    model: Tag,
+                    as: "tag",
+                    attributes: ['name'],
+                }],
+                order: sequelize_pool.literal(`FIELD(post.id, ${post_score.map(post => post.postId).join(', ')})`),
+            })
+            // console.log(recommendPosts);
+            return recommendPosts;
+        } catch (err) {
+            console.error('Error getting maybe like posts:', err);
             throw err;
         }
     }

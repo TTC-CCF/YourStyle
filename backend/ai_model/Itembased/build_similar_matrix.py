@@ -21,7 +21,7 @@ connection = mysql.connector.connect(
     database=os.getenv("MYSQL_DB"),
 )
 
-SAVE_PATH=os.getenv("SIMILAR_MATRIX_PATH")
+SAVE_PATH=os.getenv("ITEM_SIMILAR_MATRIX_PATH")
 
 def custom_tokenizer(text):
     if any(ord(c) > 127 for c in text):
@@ -60,4 +60,6 @@ def build_similar_matrix() :
     
     
 if __name__ == "__main__" :
+    print("Building similar matrix...")
     build_similar_matrix()
+    print("Done!")
