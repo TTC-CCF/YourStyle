@@ -100,6 +100,8 @@ export default function SignUpScreen() {
                     >
                         <Text style={styles.signInText}>Sign up</Text>
                     </TouchableOpacity>
+                    <Text style={styles.infoText}>Sign up with Google</Text>
+
                     <SignInWithOAuth />
                 </>
             )}

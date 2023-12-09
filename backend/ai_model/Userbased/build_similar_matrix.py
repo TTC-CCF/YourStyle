@@ -35,7 +35,7 @@ def build_similar_matrix() :
     df_transposed = df.pivot(index='user_id', columns='post_id', values='score')
     avg_rating = df_transposed.mean(axis=1)
     avg_rating = df_transposed.sub(avg_rating, axis=0)
-    print(avg_rating)
+
     cosine_sim = cosine_similarity(avg_rating.to_numpy())
     
     # save cosine similarity matrix to csv file

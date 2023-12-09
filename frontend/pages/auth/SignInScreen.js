@@ -66,23 +66,24 @@ export default function SignInScreen({ navigation }) {
 			>
 				<Text style={styles.signInText}>Sign in</Text>
 			</TouchableOpacity>
-
-			<Text style={styles.infoText}>
-				Don't have an account?
-			</Text>
-			<Button
-				title="Sign up with email"
+			<TouchableOpacity
+				style={styles.signInButton}
+				title="Sign up"
 				onPress={() => navigation.navigate("SignUp")}
-			/>
-			<SignInWithOAuth />
+			>
+				<Text style={styles.signInText}>Sign up</Text>
+			</TouchableOpacity>
 
-			<Text style={styles.infoText}>Or, you can just use e-Closet</Text>
 			<TouchableOpacity
 				onPress={() => navigation.navigate("Closet")}
 				style={styles.signInButton}
 			>
 				<Text style={styles.signInText}>e-Closet</Text>
 			</TouchableOpacity>
+            <Text style={styles.infoText}>Sign in with Google</Text>
+
+			<SignInWithOAuth />
+
 			
 		</View>
 	);

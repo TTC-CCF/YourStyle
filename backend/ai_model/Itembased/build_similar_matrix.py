@@ -48,13 +48,13 @@ def build_similar_matrix() :
     df_combined["id"] = df["id"].unique()
     tmp = df.groupby("id").agg({"name": lambda x: " ".join(x), "title": lambda x: x.iloc[0], "description": lambda x: x.iloc[0]}).reset_index()
     df_combined["combined"] = tmp["name"] + " " + tmp["title"] + " " + tmp["description"]
-        
+
     # calculate cosine similarity
     vectorizer = TfidfVectorizer(tokenizer=custom_tokenizer, stop_words=stopwords.words('english'))
     tfidf_matrix = vectorizer.fit_transform(df_combined["combined"])
     cosine_sim = cosine_similarity(tfidf_matrix.toarray())
     cosine_sim_df = pd.DataFrame(cosine_sim, index=df_combined["id"], columns=df_combined["id"])
-        
+
     # save cosine similarity matrix to npy file
     cosine_sim_df.to_csv(SAVE_PATH)
     

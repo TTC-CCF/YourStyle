@@ -29,6 +29,21 @@ export default class User extends Model {
         }
     }
 
+    static async getUser(userId) {
+        try {
+            const user = await this.findOne({
+                where: {
+                    id: userId,
+                }
+            });
+            console.log(user)
+            return user;
+        } catch (error) {
+            console.error('Error getting user:', error);
+            throw error;
+        }
+    }
+
     static async getLatestClickedPosts(userId) {
         try {
             let latestClickedPosts = await User.findOne({

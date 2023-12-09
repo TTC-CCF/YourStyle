@@ -1,7 +1,7 @@
 import PostModel from "../models/PostModel";
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TextInput, Button, TouchableWithoutFeedback } from "react-native";
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
+import FontAwesome from "@expo/vector-icons/FontAwesome"
 
 
 export default function SearchComponent({ onSearch }) {
@@ -34,16 +34,16 @@ export default function SearchComponent({ onSearch }) {
                 onChangeText={setSearchText}
             />
             {isFocused && (
-                <Icon 
-                    name="search"
-                    size={30} 
-                    style={{ position: "absolute", right: 20 }}
+                <Pressable
                     onPress={() => {
                         onSearch(searchText);
-                        setSearchText("");
-                        // Clear the text input value
+                        handleBlur();
                     }}
-                />
+                >
+                    <View style={styles.searchButton}>
+                        <FontAwesome name="search" size={24} color="black" />
+                    </View>
+                </Pressable>
             )}
             
             

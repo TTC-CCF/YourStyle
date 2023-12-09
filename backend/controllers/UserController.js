@@ -19,4 +19,21 @@ export default class UserController {
 
     }
 
+    async GetUser(req, res) {
+        try {
+            if (req.params == undefined || req.params.id == undefined) {
+                res.status(400).json({ message: "Bad Request" });
+                return;
+            }
+
+            const userId = req.params.id;
+            const user = await User.getUser(userId);
+            res.status(200).json(user);
+
+        } catch (err) {
+            console.error('Error getting user:', err);
+            res.status(500).json({ message: "Internal Server Error" });
+        }
+    }
+
 }

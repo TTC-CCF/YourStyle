@@ -67,6 +67,10 @@ module.exports = {
       },
       post_id: {
         type: Sequelize.INTEGER,
+        references: {
+            model: 'post',
+            key: 'id'
+        }
       },
       name: Sequelize.STRING,
     });

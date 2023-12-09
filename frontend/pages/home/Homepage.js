@@ -27,6 +27,7 @@ export default function Homepage({ navigation }) {
 
     useEffect(() => {
         fetchRecommendation();
+        console.log(user.username)
     }, []);
     async function fetchRecommendation() {
         const post = await PostModel.getRecommendation(user.id);
@@ -39,7 +40,19 @@ export default function Homepage({ navigation }) {
             {posts.length === 0 ? (
                 <Text>Loading...</Text>
             ) : (
-                <CarouselComponent title={'你可能喜歡'} blocks={posts} navigation={navigation}/>
+                <>
+                {isLoaded && isSignedIn && (
+                    <>
+                    {user.username === null ? (
+                        <Text>Welcome {user.firstName} {user.lastName}</Text>
+                    ) : (
+                        <Text>Welcome {user.username}</Text>
+                    )}
+                    </>
+                )}
+                <CarouselComponent title={'猜你喜歡'} blocks={posts} navigation={navigation}/>
+                </>
+                
             )}
             <SignOut />
         </View>
