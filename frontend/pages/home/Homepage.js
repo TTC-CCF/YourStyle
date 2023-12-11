@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Button } from "react-native";
+import { Text, View, StyleSheet, Button, Dimensions } from "react-native";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import PostModel from "../../models/PostModel";
 import CarouselComponent from "../../components/CarouselComponent";
@@ -18,43 +18,60 @@ const SignOut = () => {
                 }}
             />
         </View>
-    );
+    ); 
 };
 
 export default function Homepage({ navigation }) {
     const { isLoaded, isSignedIn, user } = useUser();
     const [posts, setPosts] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [height, setHeight] = useState(0);
+    const [width, setWidth] = useState(0);
 
     useEffect(() => {
         fetchRecommendation();
-        console.log(user.username)
+        fetchTopUsers();
     }, []);
+
+    function onPageLayout(event) {
+        const { width, height } = event.nativeEvent.layout;
+        setHeight(height);
+        setWidth(width);
+    }
+
     async function fetchRecommendation() {
         const post = await PostModel.getRecommendation(user.id);
-        // console.log(post.data);
         setPosts(post.data);
     }
 
+    async function fetchTopUsers() {
+        const user = await PostModel.getTopUsers();
+        setUsers(user.data);
+    }
+ 
     return (
-        <View style={styles.container}>
+        <View style={styles.container} onLayout={onPageLayout}>
             {posts.length === 0 ? (
                 <Text>Loading...</Text>
             ) : (
                 <>
-                {isLoaded && isSignedIn && (
-                    <>
-                    {user.username === null ? (
-                        <Text>Welcome {user.firstName} {user.lastName}</Text>
-                    ) : (
-                        <Text>Welcome {user.username}</Text>
-                    )}
-                    </>
-                )}
-                <CarouselComponent title={'猜你喜歡'} blocks={posts} navigation={navigation}/>
+                <CarouselComponent 
+                    title={'猜你喜歡'}
+                    size={{width: width, height: height * 0.50}}
+                    type={"post"} 
+                    blocks={posts} 
+                    navigation={navigation}
+                />
+                <CarouselComponent
+                    title={'時尚博主'}
+                    size={{width: width, height: height * 0.3}}
+                    type={"topUsers"}
+                    blocks={users}
+                    navigation={navigation}
+                />
                 </>
                 
             )}
-            <SignOut />
         </View>
     )
 };

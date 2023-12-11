@@ -1,6 +1,5 @@
 export default class UserModel {
-    static createUser = async (username, email, id) => {
-        console.log(username, email, id);
+    static createUser = async (id) => {
 
         const response = await fetch(
             `${process.env.EXPO_PUBLIC_ENDPOINT}/user/create`,
@@ -10,29 +9,31 @@ export default class UserModel {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    username,
-                    email,
                     id,
                 }),
             }
         );
         const data = await response.json();
-        console.log(data);
         return data;
     }
 
-    static getUserFromClerk = async (id) => {
-        console.log(process.env.EXPO_PUBLIC_CLERK_SECRET_KEY)
-        const response = await fetch(
-            `https://api.clerk.com/v1/users/${id}`,
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${process.env.EXPO_PUBLIC_CLERK_SECRET_KEY}`,
-                },
-            }
-        )
+    static getUser = async (id) => {
+        console.log(id);
+        const response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/user/${id}`);
+        const data = await response.json();
+        return data.data;
+    }
+
+    static getUserPosts = async (id) => {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/post/userposts/${id}`);
+        const data = await response.json();
+        return data.data;
+    }
+
+    static deleteUser = async (id) => {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/user/${id}`, {
+            method: "DELETE",
+        });
         const data = await response.json();
         return data;
     }

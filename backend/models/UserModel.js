@@ -1,16 +1,15 @@
 import sequelize_pool from "./config.js"
-import { DataTypes, Model } from "sequelize"
+import { DataTypes, Model, Sequelize } from "sequelize"
 import UserPostScore from "./UserPostScoreModel.js";
 import Post from "./PostModel.js";
+import Follows from "./FollowsModel.js";
 
 export default class User extends Model {
-    static async createUser(username, email, id) {
+    static async createUser(id) {
         const transaction = await sequelize_pool.transaction();
         try {
             const user = await this.create({
                 id: id,
-                username: username,
-                email: email,
                 role: 'user',
             });
 
@@ -20,7 +19,6 @@ export default class User extends Model {
 
             await transaction.commit();
 
-            console.log('User created:', user.toJSON());
             return user;
         } catch (error) {
             console.error('Error creating user:', error);
@@ -29,17 +27,19 @@ export default class User extends Model {
         }
     }
 
-    static async getUser(userId) {
+    static async getTopUsers(topNum) {
         try {
-            const user = await this.findOne({
-                where: {
-                    id: userId,
-                }
+            const users = await this.findAll({
+                attributes: [
+                    'id', 
+                    [sequelize_pool.literal(`(SELECT COUNT(*) FROM follows WHERE followee_id = user.id)`), 'follower_count']
+                ],
+                order: sequelize_pool.literal('follower_count DESC'),
+                limit: topNum,
             });
-            console.log(user)
-            return user;
+            return users;
         } catch (error) {
-            console.error('Error getting user:', error);
+            console.error('Error getting top users:', error);
             throw error;
         }
     }
@@ -88,20 +88,57 @@ export default class User extends Model {
         }
     }
 
-    static async setDeletedPost(postId) {
+    static async followUser(followerId, followeeId) {
+        const transaction = await sequelize_pool.transaction();
         try {
-            await User.update({
-                latest_clicked_posts: null,
-            }, {
-                where: {
-                    latest_clicked_posts: postId,
-                }
+            await Follows.create({
+                follower_id: followerId,
+                followee_id: followeeId,
             });
-
+            await transaction.commit();
         } catch (error) {
-            console.error('Error setting deleted post:', error);
+            console.error('Error following user:', error);
+            await transaction.rollback();
             throw error;
         }
+    }
+
+    static async unfollowUser(followerId, followeeId) {
+        const transaction = await sequelize_pool.transaction();
+        try {
+            const rowDeleted = await Follows.destroy({
+                where: {
+                    follower_id: followerId,
+                    followee_id: followeeId,
+                }
+            });
+            await transaction.commit();
+
+            return rowDeleted;
+        } catch (error) {
+            console.error('Error following user:', error);
+            await transaction.rollback();
+            throw error;
+        }
+    }
+
+    static async deleteUser(userId) {
+        const transaction = await sequelize_pool.transaction();
+        try {
+            const rowDeleted = await User.destroy({
+                where: {
+                    id: userId,
+                }
+            });
+            await transaction.commit();
+
+            return rowDeleted;
+        } catch (error) {
+            console.error('Error updating user:', error);
+            await transaction.rollback();
+            throw error;
+        }
+        
     }
 }
 
@@ -110,15 +147,6 @@ User.init(
         id: {
             type: DataTypes.STRING,
             primaryKey: true,
-        },
-        username: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        email: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            unique: true,
         },
         latest_clicked_posts: {
             type: DataTypes.INTEGER,
@@ -129,6 +157,11 @@ User.init(
             defaultValue: "user",
             allowNull: false,
         },
+        height: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
+        }
     },
     {
         sequelize: sequelize_pool,
@@ -137,3 +170,20 @@ User.init(
         timestamps: false,
     }
 )
+
+
+User.belongsToMany(User, {
+    as: 'followees',
+    through: Follows,
+    foreignKey: 'follower_id',
+    otherKey: 'followee_id',
+    timestamps: false,
+});
+
+User.belongsToMany(User, {
+    as: 'followers',
+    through: Follows,
+    foreignKey: 'followee_id',
+    otherKey: 'follower_id',
+    timestamps: false,
+});

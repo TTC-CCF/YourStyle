@@ -5,6 +5,7 @@ import fs from 'fs';
 import { exec } from 'child_process';
 import { DataFrame } from 'dataframe-js';
 import UserPostScore from '../models/UserPostScoreModel.js';
+import { users } from "@clerk/clerk-sdk-node";
 
 function RemoveImage(file) {
     if (file === undefined) return;
@@ -120,6 +121,29 @@ export default class PostController {
         }
     }
 
+    async GetUserPosts(req, res) {
+        try {
+            if (req.params === undefined || req.params.id === undefined) {
+                res.status(400).json({ message: "Bad Request" });
+                return;
+            }
+
+            const userId = req.params.id;
+            const posts = await Post.getUserPosts(userId);
+
+            if (posts === null || posts.length === 0) {
+                res.status(404).json({ message: "Posts not found" });
+                return;
+            }
+
+            res.status(200).json({data: posts});
+
+        } catch (err) {
+            console.error('Error getting user posts:', err);
+            res.status(500).json({ message: "Internal Server Error" });
+        }
+    }
+
     async ClickPost(req, res) {
         try {
             if (req.body === undefined || req.body.userId === undefined || req.body.postId === undefined) {
@@ -147,7 +171,11 @@ export default class PostController {
 
             const postId = req.params.id;
             const post = await Post.getPost(postId);
-            res.status(200).json(post);
+            if (post === null) {
+                res.status(404).json({ message: "Post not found" });
+            } else {
+                res.status(200).json(post);
+            }
 
         } catch (err) {
             console.error('Error getting post:', err);
@@ -185,8 +213,9 @@ export default class PostController {
             }
 
             const postId = req.params.id;
-            const [error, post] = await Post.deletePost(postId);
-            if (error) {
+
+            const post = await Post.deletePost(postId);
+            if (post === 0) {
                 res.status(404).json({ message: "Post not found" });
                 return;
             }
@@ -235,12 +264,28 @@ export default class PostController {
             const similar_users = await GetUBSimilarUsers(userId);
             const result = await UserPostScore.maybeLikePosts(similar_users);
 
+
             if (result === null || result.length === 0) {
                 res.status(404).json({ message: "Posts not found" });
                 return;
             }
 
-            res.status(200).json({data: result});
+            let posts = result.map(post => post.toJSON());
+
+            let userIds = [...new Set(posts.map(post => post.user_id))]
+            let _users = [];
+            
+            for (const id of userIds) {
+                const user = await users.getUser(id);
+                _users.push(user);
+            }
+
+            for (const post of posts) {
+                const user = _users.find(user => user.id === post.user_id);
+                post.user = user;
+            }
+
+            res.status(200).json({data: posts});
         } catch (err) {
             console.error('Error getting maybe like posts:', err);
             res.status(500).json({ message: "Internal Server Error" });

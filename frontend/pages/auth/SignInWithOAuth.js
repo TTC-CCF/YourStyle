@@ -1,10 +1,9 @@
 import React from "react";
 import * as WebBrowser from "expo-web-browser";
-import { Text } from "react-native";
+import { Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { useOAuth, useAuth } from "@clerk/clerk-expo";
 import { useWarmUpBrowser } from "../../hooks/warmUpBrowser";
 import UserModel from "../../models/UserModel";
-import Icon from 'react-native-vector-icons/FontAwesome';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -28,8 +27,6 @@ const SignInWithOAuth = () => {
 
             if (signUp && signUp.createdUserId) {
                 await UserModel.createUser(
-                    `${signUp.firstName} ${signUp.lastName}`,
-                    signUp.emailAddress,
                     signUp.createdUserId
                 );
             }
@@ -41,13 +38,42 @@ const SignInWithOAuth = () => {
 
     return (
         <>
-            <Icon
-                name="google"
-                size={30}
+            <TouchableOpacity 
+                style={styles.container} 
                 onPress={onPress}
-            />
+            >
+                <Image
+                    source={require('../../assets/google-logo.png')}
+                    fadeDuration={0}
+                    style={{ width: 50, height: 50 }}
+                />
+                <Text style={styles.signInText}>Sign in with Google</Text>
+            </TouchableOpacity>
+                
         </>
        
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flexDirection: "row", 
+        alignItems: "center",
+        backgroundColor: "#fff",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    signInText: {
+        fontSize: 20,
+        padding: 10,
+    }
+
+});
+
 export default SignInWithOAuth;

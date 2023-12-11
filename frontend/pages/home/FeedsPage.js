@@ -2,8 +2,8 @@ import { Text, View, StyleSheet, ActivityIndicator, Image, ScrollView, Dimension
 import React, { useEffect, useState } from "react";
 import PostModel from "../../models/PostModel";
 import { useUser } from "@clerk/clerk-expo";
-import PostComponent from "../../components/PostComponent";
-import SearchComponent from "../../components/SearchComponent";
+import SearchBar from "../../components/SearchBar";
+import PostGrid from "../../components/PostGrid";
 
 export default function Feeds({ route, navigation }) {
     const [posts, setPosts] = useState([]);
@@ -30,7 +30,7 @@ export default function Feeds({ route, navigation }) {
         if (!isSignedIn) {
             return;
         }
-        const post= await PostModel.listPosts(user.id, nextPage);
+        const post = await PostModel.listPosts(user.id, nextPage);
         
         if (append){
             const newPosts = await post.data.filter((post) => {
@@ -47,23 +47,6 @@ export default function Feeds({ route, navigation }) {
             setPosts(post.data);
         }
         return post.nextpage;
-    }
-    
-    function chunckArray(myArray, chunk_size){
-        var index = 0;
-        var arrayLength = myArray.length;
-        var tempArray = [];
-        
-        if (arrayLength <= chunk_size) {
-            return [myArray];
-        }
-
-        for (index = 0; index < arrayLength; index += chunk_size) {
-            let myChunk = myArray.slice(index, index+chunk_size);
-            tempArray.push(myChunk);
-        }
-    
-        return tempArray;
     }
 
     async function handleScroll({layoutMeasurement, contentOffset, contentSize}) {
@@ -112,7 +95,7 @@ export default function Feeds({ route, navigation }) {
                 <>
                     {posts.length == 0 ? (
                         <>
-                            <SearchComponent onSearch={handleSearch}/>
+                            <SearchBar onSearch={handleSearch}/>
                             {fetching && <ActivityIndicator/>}
                             <View style={styles.container}>
                             <Text>There's no posts in your feeds...</Text>
@@ -121,16 +104,10 @@ export default function Feeds({ route, navigation }) {
                         </>
                     ) : (
                         <>
-                            <SearchComponent onSearch={handleSearch}/>
+                            <SearchBar onSearch={handleSearch}/>
                             {fetching && <ActivityIndicator/>}
 
-                            {chunckArray(posts, 3).map((posts, index) => (
-                                <View key={index} style={{flexDirection: "row"}}>
-                                    {posts.map((post, index) => (
-                                        <PostComponent key={index} post={post} navigation={navigation} size={({width: Dimensions.get("window").width/3, height: 200})} />
-                                    ))}
-                                </View>
-                            ))}
+                            <PostGrid posts={posts} navigation={navigation}/>
                         </>
                     )}
                 </>

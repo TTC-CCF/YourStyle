@@ -4,7 +4,12 @@ import UserController from '../controllers/UserController.js'
 const router = express.Router();
 const userController = new UserController();
 
+router.get('/topusers', userController.GetTopUsers);
+router.get('/:id', userController.GetUser)
 router.post('/create', userController.CreateUser);
-router.get('/:id', userController.GetUser);
+router.post('/follow', userController.FollowUser);
+router.post('/unfollow/:id', userController.UnfollowUser);
+router.put('/height', userController.UpdateUserHeight);
+router.delete('/:id', userController.DeleteUser);
 
 export default router;

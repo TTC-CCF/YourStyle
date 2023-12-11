@@ -101,7 +101,6 @@ export default class PostModel {
         try {
             let response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/post/maybelike/${userId}`);
             let json = await response.json();
-            console.log(json.data)
             if (json.data === undefined) json = {data: []};
             return json;
         } catch (error) {
@@ -113,6 +112,18 @@ export default class PostModel {
         try {
             let response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/post/search?keyword=${keyword}`);
             let json = await response.json();
+            if (json.data === undefined) json = {data: []};
+            return json;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    static async getTopUsers() {
+        try {
+            let response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/user/topusers`);
+            let json = await response.json();
+
             if (json.data === undefined) json = {data: []};
             return json;
         } catch (error) {

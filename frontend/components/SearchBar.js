@@ -1,10 +1,9 @@
-import PostModel from "../models/PostModel";
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
+import { View, StyleSheet, TextInput, Pressable } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome"
 
 
-export default function SearchComponent({ onSearch }) {
+export default function SearchBar({ onSearch }) {
     const [isFocused, setIsFocused] = useState(false);
     const [searchText, setSearchText] = useState("");
 
@@ -40,9 +39,7 @@ export default function SearchComponent({ onSearch }) {
                         handleBlur();
                     }}
                 >
-                    <View style={styles.searchButton}>
-                        <FontAwesome name="search" size={24} color="black" />
-                    </View>
+                    <FontAwesome name="search" size={24} color="black" />
                 </Pressable>
             )}
             
@@ -54,7 +51,9 @@ export default function SearchComponent({ onSearch }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        flexDirection: "row",
         alignItems: "center",
         justifyContent: "center"
     },
+    
 });

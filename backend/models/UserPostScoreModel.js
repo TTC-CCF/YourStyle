@@ -85,14 +85,16 @@ export default class UserPostScore extends Model {
                 where: {
                     id: post_score.map(post => post.postId),
                 },
-                include: [{
-                    model: Tag,
-                    as: "tag",
-                    attributes: ['name'],
-                }],
+                include: [
+                    {
+                        model: Tag,
+                        as: "tag",
+                        attributes: ['name'],
+                    }
+                ],
                 order: sequelize_pool.literal(`FIELD(post.id, ${post_score.map(post => post.postId).join(', ')})`),
             })
-            // console.log(recommendPosts);
+
             return recommendPosts;
         } catch (err) {
             console.error('Error getting maybe like posts:', err);

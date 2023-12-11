@@ -80,7 +80,6 @@ export default function SignInScreen({ navigation }) {
 			>
 				<Text style={styles.signInText}>e-Closet</Text>
 			</TouchableOpacity>
-            <Text style={styles.infoText}>Sign in with Google</Text>
 
 			<SignInWithOAuth />
 

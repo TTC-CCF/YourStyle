@@ -2,16 +2,12 @@ import { Text, View, StyleSheet, Image, TouchableOpacity, Dimensions, ScrollView
 import PostModel from "../../models/PostModel";
 import { useUser, useAuth } from "@clerk/clerk-expo";
 import { useEffect, useState } from "react";
+import UserPreview from "../../components/UserPreview";
 
 export default function PostDetailComponent({route, navigation}) {
     const { getToken } = useAuth();
     const {isLoaded, isSignedIn, user} = useUser();
-    const [post, setPost] = useState({});
-
-    useEffect(() => {
-        setPost(route.params.post);
-        console.log(post)
-    }, []);
+    const post = route.params.post;
 
     async function handleDelete() {
         const token = await getToken();
@@ -24,8 +20,8 @@ export default function PostDetailComponent({route, navigation}) {
             <ScrollView
                 contentContainerStyle={styles.contentContainer}
             >
-                <Image source={{uri: post.image_url}} style={{width: 300, height: 450}} />
-                <Text style={styles.title}>{post.title}</Text>
+                <UserPreview user={post.user} size={{width: Dimensions.get("window").width}} navigation={navigation} />
+                <Image source={{uri: post.image_url}} style={{width: Dimensions.get("window").width, height: 520}} />
                 <Text style={styles.description}>{post.description}</Text>
                 {user.id === post.user_id && (
                     <TouchableOpacity
@@ -49,7 +45,6 @@ const styles = StyleSheet.create({
     contentContainer: {
         alignItems: "center",
         justifyContent: "center",
-        marginTop: 50,
     },
     title: {
         fontSize: 20,

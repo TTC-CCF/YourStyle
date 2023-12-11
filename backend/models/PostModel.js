@@ -40,6 +40,26 @@ export default class Post extends Model {
         
     }
 
+    static async getUserPosts(user_id) {
+        try {
+            const posts = await Post.findAll({
+                where: {
+                    user_id: user_id,
+                },
+                include: [{
+                    model: Tag,
+                    as: "tag",
+                    attributes: ['name'],
+                }],
+                attributes: ['id', 'title', 'description', 'image_url', 'likes', 'shares', 'user_id'],
+            });
+            return posts;
+        } catch (err) {
+            console.error('Error getting user posts:', err);
+            throw err;
+        }
+    }
+
     static async getPost(postId) {
         try {
             const post = await Post.findByPk(postId);
@@ -98,17 +118,17 @@ export default class Post extends Model {
                     [Sequelize.Op.or]: [
                         {
                             title: {
-                                [Sequelize.Op.like]: `%${keyword}%`
+                                [Sequelize.Op.substring]: keyword
                             }
                         },
                         {
                             description: {
-                                [Sequelize.Op.like]: `%${keyword}%`
+                                [Sequelize.Op.substring]: keyword
                             }
                         },
                         {
                             "$tag.name$": {
-                                [Sequelize.Op.like]: `%${keyword}%`
+                                [Sequelize.Op.substring]: keyword
                             }
                         }
                     ]
@@ -118,9 +138,9 @@ export default class Post extends Model {
                     as: "tag",
                     attributes: ['name'],
                 }],
-                attributes: ['id', 'title', 'description', 'image_url'],
+                attributes: ['id', 'title', 'description', 'image_url', 'user_id'],
             });
-            console.log(posts.length)
+
             return posts;
         } catch (err) {
             console.error('Error searching posts:', err);
@@ -131,18 +151,15 @@ export default class Post extends Model {
     static async deletePost(postId) {
         const transaction = await sequelize_pool.transaction();
         try {
-            const post = await Post.findByPk(postId);
-            if (post === null) {
-                return [1, null];
-            }
-
-            await post.destroy();
-            
-            await User.setDeletedPost(postId)
+            const rowDeleted = await Post.destroy({
+                where: {
+                    id: postId,
+                }
+            });
 
             await transaction.commit();
-            console.log(post);
-            return [0, post];
+            
+            return rowDeleted;
         } catch (error) {
             console.error('Error deleting post:', err);
             await transaction.rollback();

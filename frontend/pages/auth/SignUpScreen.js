@@ -21,17 +21,23 @@ export default function SignUpScreen() {
         }
 
         try {
-            await signUp.create({
+            const res = await signUp.create({
                 username,
                 emailAddress,
                 password,
             });
+
+            console.log(JSON.stringify(res, null, 2));
             
             // send the email.
-            await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+            // await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
 
             // change the UI to our pending section.
-            setPendingVerification(true);
+            // setPendingVerification(true);
+
+            await UserModel.createUser(res.createdUserId);
+
+            await setActive({ session: res.createdSessionId });
         } catch (err) {
             console.error(JSON.stringify(err, null, 2));
             setError(err.errors[0].longMessage);
@@ -50,7 +56,7 @@ export default function SignUpScreen() {
             });
             console.log(JSON.stringify(completeSignUp, null, 2));
 
-            await UserModel.createUser(username, emailAddress, completeSignUp.createdUserId);
+            await UserModel.createUser(completeSignUp.createdUserId);
 
             await setActive({ session: completeSignUp.createdSessionId });
         } catch (err) {
@@ -100,7 +106,6 @@ export default function SignUpScreen() {
                     >
                         <Text style={styles.signInText}>Sign up</Text>
                     </TouchableOpacity>
-                    <Text style={styles.infoText}>Sign up with Google</Text>
 
                     <SignInWithOAuth />
                 </>
