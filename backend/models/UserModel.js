@@ -122,6 +122,68 @@ export default class User extends Model {
         }
     }
 
+    static async getFollowers(userId) {
+        try {
+            const follows = await Follows.findAll({
+                where: {
+                    followee_id: userId,
+                },
+                attributes: ['follower_id'],
+            });
+
+            return follows;
+        } catch (error) {
+            console.error('Error getting follows:', error);
+            throw error;
+        }
+    }
+
+    static async getFollowees(userId) {
+        try {
+            const follows = await Follows.findAll({
+                where: {
+                    follower_id: userId,
+                },
+                attributes: ['followee_id'],
+            });
+
+            return follows;
+        } catch (error) {
+            console.error('Error getting follows:', error);
+            throw error;
+        }
+    }
+
+    static async getFollowerCount(userId) {
+        try {
+            const followerCount = await Follows.count({
+                where: {
+                    followee_id: userId,
+                },
+            });
+
+            return followerCount;
+        } catch (error) {
+            console.error('Error getting follower count:', error);
+            throw error;
+        }
+    }
+
+    static async getFolloweeCount(userId) {
+        try {
+            const followeeCount = await Follows.count({
+                where: {
+                    follower_id: userId,
+                },
+            });
+
+            return followeeCount;
+        } catch (error) {
+            console.error('Error getting follower count:', error);
+            throw error;
+        }
+    }
+
     static async deleteUser(userId) {
         const transaction = await sequelize_pool.transaction();
         try {

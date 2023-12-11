@@ -18,7 +18,6 @@ export default class UserModel {
     }
 
     static getUser = async (id) => {
-        console.log(id);
         const response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/user/${id}`);
         const data = await response.json();
         return data.data;
@@ -28,6 +27,18 @@ export default class UserModel {
         const response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/post/userposts/${id}`);
         const data = await response.json();
         return data.data;
+    }
+
+    static getUserFollowers = async (id) => {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/user/followers/${id}`);
+        const data = await response.json();
+        return data.data === undefined ? [] : data.data;
+    }
+
+    static getUserFollowees = async (id) => {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/user/followees/${id}`);
+        const data = await response.json();
+        return data.data === undefined ? [] : data.data;
     }
 
     static deleteUser = async (id) => {

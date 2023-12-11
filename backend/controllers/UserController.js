@@ -7,12 +7,13 @@ export default class UserController {
         try {
             const result = await User.getTopUsers(10);
             const userIds = result.map(user => user.dataValues.id);
-            const _users = [];
-            for (const idx in userIds) {
-                let user = await users.getUser(userIds[idx]);
-                user.follows = result[idx].dataValues.follower_count;
-                _users.push(user);
-            }
+            let _users = await users.getUserList({
+                userId: userIds,
+            });
+
+            _users = _users.sort((a, b) => {
+                return userIds.indexOf(a.id) - userIds.indexOf(b.id);
+            });
 
             res.status(200).json({ data: _users});
         } catch (err) {
@@ -29,8 +30,13 @@ export default class UserController {
             }
 
             const userId = req.params.id;
-            console.log(userId)
-            const user = await users.getUser(userId);
+            let user = await users.getUser(userId);
+
+            const followeeCount = await User.getFolloweeCount(userId);
+            const followerCount = await User.getFollowerCount(userId);
+            
+            user.followee_count = followeeCount;
+            user.follower_count = followerCount;
 
             res.status(200).json({ data: user });
         } catch (err) {
@@ -39,6 +45,62 @@ export default class UserController {
                 res.status(404).json({ message: "User not found" });
             else 
                 res.status(500).json({ message: "Internal Server Error" });
+        }
+    }
+
+    async GetFollowers(req, res) {
+        try {
+            if (req.params === undefined || req.params.id === undefined) {
+                res.status(400).json({ message: "Bad Request" });
+                return;
+            }
+
+            const userId = req.params.id;
+            const result = await User.getFollowers(userId);
+
+            if (result === null || result.length === 0) {
+                res.status(404).json({ message: "User not found" });
+                return;
+            }
+
+            const userIds = result.map(follower => follower.dataValues.follower_id);
+
+            let followers = await users.getUserList({
+                userId: userIds,
+            });
+
+            res.status(200).json({ data: followers });
+        } catch (err) {
+            console.error('Error getting followers:', err);
+            res.status(500).json({ message: "Internal Server Error" });
+        }
+    }
+
+    async GetFollowees(req, res) {
+        try {
+            if (req.params === undefined || req.params.id === undefined) {
+                res.status(400).json({ message: "Bad Request" });
+                return;
+            }
+
+            const userId = req.params.id;
+            const result = await User.getFollowees(userId);
+
+            if (result === null || result.length === 0) {
+                res.status(404).json({ message: "User not found" });
+                return;
+            }
+
+            const userIds = result.map(followee => followee.dataValues.followee_id);
+
+            let followees = await users.getUserList({
+                userId: userIds,
+            });
+
+            res.status(200).json({ data: followees });
+        } catch (err) {
+            console.error('Error getting followees:', err);
+            res.status(500).json({ message: "Internal Server Error" });
         }
     }
 

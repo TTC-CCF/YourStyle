@@ -75,7 +75,7 @@ export default function SignInScreen({ navigation }) {
 			</TouchableOpacity>
 
 			<TouchableOpacity
-				onPress={() => navigation.navigate("Closet")}
+				onPress={() => navigation.navigate("eCloset")}
 				style={styles.signInButton}
 			>
 				<Text style={styles.signInText}>e-Closet</Text>

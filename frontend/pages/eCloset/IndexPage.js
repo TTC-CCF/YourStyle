@@ -1,21 +1,34 @@
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions} from "react-native";
 
-export default function ClosetPage() {
+export default function IndexPage({ navigation }) {
+
+    function gotoClosetPage() {
+        navigation.navigate("Closet");
+    }
+
+    function gotoCalenderPage() {
+        navigation.navigate("Calender");
+    }
+
+    function gotoOutfitPage() {
+        navigation.navigate("Outfit");
+    }
+
     return (
         <View style={styles.container}>
                 <View style={styles.section}>
                 <View style={styles.block}>
-                    <TouchableOpacity style={styles.button}>
+                    <TouchableOpacity style={styles.button} onPress={gotoClosetPage}>
                         <Text style={styles.infoText}>衣櫃</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.block}>
-                    <TouchableOpacity style={styles.button}>
+                    <TouchableOpacity style={styles.button} onPress={gotoCalenderPage}>
                         <Text style={styles.infoText}>穿搭日曆</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.block}>
-                    <TouchableOpacity style={styles.button}>
+                    <TouchableOpacity style={styles.button} onPress={gotoOutfitPage}>
                         <Text style={styles.infoText}>我的搭配</Text>
                     </TouchableOpacity>
                 </View>

@@ -6,6 +6,8 @@ const userController = new UserController();
 
 router.get('/topusers', userController.GetTopUsers);
 router.get('/:id', userController.GetUser)
+router.get('/followers/:id', userController.GetFollowers);
+router.get('/followees/:id', userController.GetFollowees);
 router.post('/create', userController.CreateUser);
 router.post('/follow', userController.FollowUser);
 router.post('/unfollow/:id', userController.UnfollowUser);

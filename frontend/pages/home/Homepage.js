@@ -51,24 +51,25 @@ export default function Homepage({ navigation }) {
  
     return (
         <View style={styles.container} onLayout={onPageLayout}>
+            
             {posts.length === 0 ? (
                 <Text>Loading...</Text>
             ) : (
                 <>
-                <CarouselComponent 
-                    title={'猜你喜歡'}
-                    size={{width: width, height: height * 0.50}}
-                    type={"post"} 
-                    blocks={posts} 
-                    navigation={navigation}
-                />
-                <CarouselComponent
-                    title={'時尚博主'}
-                    size={{width: width, height: height * 0.3}}
-                    type={"topUsers"}
-                    blocks={users}
-                    navigation={navigation}
-                />
+                    <CarouselComponent 
+                        title={'猜你喜歡'}
+                        size={{width: width, height: height * 0.50}}
+                        type={"post"} 
+                        blocks={posts} 
+                        navigation={navigation}
+                    />
+                    <CarouselComponent
+                        title={'時尚博主'}
+                        size={{width: width, height: height * 0.3}}
+                        type={"topUsers"}
+                        blocks={users}
+                        navigation={navigation}
+                    />
                 </>
                 
             )}
