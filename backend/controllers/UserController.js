@@ -15,6 +15,11 @@ export default class UserController {
                 return userIds.indexOf(a.id) - userIds.indexOf(b.id);
             });
 
+            _users = _users.map((user, index) => {
+                user.follower_count = result[index].dataValues.follower_count;
+                return user;
+            });
+
             res.status(200).json({ data: _users});
         } catch (err) {
             console.error('Error getting top users:', err);

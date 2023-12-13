@@ -1,12 +1,23 @@
-import { Text, View, StyleSheet, ScrollView } from "react-native";
+import { Text, View, StyleSheet, ScrollView, TouchableOpacity} from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import PostPreview from "./PostPreview";
-import { useEffect } from "react";
+import { useUser } from "@clerk/clerk-expo";
 import UserPreview from "./UserPreview";
 import UserImage from "./UserImage";
 
 export default function CarouselComponent({title, blocks, size, type, navigation}) {
-    
+    const { isLoaded, isSignedIn, user } = useUser();
+
+    function gotoUserDetail(_user) {
+        let navigateTo = "UserDetail";
+        if (user.id === _user.id) navigateTo = "Profile";
+        
+        if (_user.username)
+            navigation.navigate(navigateTo, {user: _user, username: _user.username});
+        else 
+            navigation.navigate(navigateTo, {user: _user, username: _user.firstName + " " + _user.lastName});
+    }
+
     return (
         <View style={{ margin: 10 }}>
             <Text style={styles.title}>{title}</Text>
@@ -23,7 +34,7 @@ export default function CarouselComponent({title, blocks, size, type, navigation
                             <View style={styles.container}>
                                 <View style={styles.postCard}>
                                     <PostPreview post={blocks[index]} navigation={navigation} size={({width: size.width * 0.7, height: size.height * 0.9})} />
-                                    <UserPreview user={blocks[index].user} size={({width: size.width * 0.7, height: size.height * 0.1})} navigation={navigation} />
+                                    <UserPreview user={blocks[index].user} follow={false} size={({width: size.width * 0.7, height: size.height * 0.1})} navigation={navigation} />
                                 </View>
                             </View> 
                         )
@@ -41,15 +52,15 @@ export default function CarouselComponent({title, blocks, size, type, navigation
                         >
                         {blocks.map((user, index) => {
                             return (
-                                <View style={styles.container} key={index}>
+                                <TouchableOpacity onPress={() => gotoUserDetail(user)} style={styles.container} key={index}>
                                     <UserImage url={user.imageUrl} size={{width: 50, height: 50, borderRadius: 25}}/>
                                     {user.username ? (
                                         <Text style={styles.title}>{user.username}</Text>
                                     ) : (
                                         <Text style={styles.title}>{user.firstName} {user.lastName}</Text>
                                     )}
-                                    <Text>追蹤數 {user.follows}</Text>
-                                </View> 
+                                    <Text>粉絲 {user.follower_count}</Text>
+                                </TouchableOpacity> 
                             )
                         })}
                         </ScrollView>

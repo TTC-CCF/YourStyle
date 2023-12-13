@@ -1,9 +1,8 @@
-import { Text, View, StyleSheet, Button, TextInput, Image, ScrollView } from "react-native";
+import { Text, View, StyleSheet, Button, TouchableOpacity, TextInput, Image, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import PostModel from "../../models/PostModel";
-import { useUser, useAuth } from "@clerk/clerk-expo";
 import * as ImagePicker from 'expo-image-picker';
-import { TouchableOpacity } from "react-native";
+import { useUser, useAuth } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 
 
@@ -12,19 +11,19 @@ export default function Post() {
     const [description, setDescription] = useState("");
     const [image, setImage] = useState(null);
     const [tags, setTags] = useState([]);
-    const {isLoaded, isSignedIn, user} = useUser();
+    const { user } = useUser();
     const { getToken } = useAuth();
 
     const imagePick = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
-            aspect: [5, 3],
             quality: 1,
         });
-
         if (!result.canceled) {
             setImage(result.assets[0].uri);
+        } else {
+            setImage(null);
         }
     }
 
@@ -45,54 +44,73 @@ export default function Post() {
 
     return (
         <View style={styles.container}>
-            <ScrollView>
-            <Text style={styles.title}>Create New Post</Text>
-            <TextInput
-                value={title}
-                placeholder="Title..."
-                placeholderTextColor="#000"
-                onChangeText={(title) => setTitle(title)}
-                style={styles.textInput}
-            />
-            <TextInput
-                value={description}
-                placeholder="Description..."
-                placeholderTextColor="#000"
-                onChangeText={(description) => setDescription(description)}
-                style={styles.textInput}
-            />
-            
-            {tags.map((input, index) => (
-                <View style={styles.tagContainer} key={index}>
-                    <TouchableOpacity onPress={() => removeTextInput(index)}>
-                        <Ionicons name="close-circle-outline" size={24} color="red" />
-                    </TouchableOpacity>
+            <ScrollView contentContainerStyle={styles.container}>
+                <Text style={[styles.title, { flex: 1 }]}>Create New Post</Text>
+                <View style={[styles.imageContainer, { flex: 3 }]}>
+                    {image ? (
+                        <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
+                    ) : (
+                        <View style={[{ flex: 1 }]}>
+                            <TouchableOpacity style={styles.button} onPress={imagePick}>
+                                <Text style={styles.buttonText}>Pick an image</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                </View>
+                <View style={[{ flex: 1 }]}>
                     <TextInput
-                        value={input}
-                        placeholder="Tag..."
+                        value={title}
+                        placeholder="Title..."
                         placeholderTextColor="#000"
-                        onChangeText={(value) => handleTagsInputChange(index, value)}
+                        onChangeText={(title) => setTitle(title)}
                         style={styles.textInput}
                     />
                 </View>
-            ))}
-            
-            <Button
-                title="Add tags"
-                onPress={addTextInput}
-            />
-            <Button
-                title="Pick an image from camera roll"
-                onPress={imagePick}
-            />
-            {image && <Image source={{uri: image}} style={{width: 200, height: 200}} />}
-            <Button
-                title="Create Post"
-                onPress={async () => {
-                    const token = await getToken();
-                    await PostModel.createPost(title, description, user.id, tags, image, token);
-                }}
-            />
+                <View style={[{ flex: 1 }]}>
+                    <TextInput
+                        value={description}
+                        placeholder="Description..."
+                        placeholderTextColor="#000"
+                        onChangeText={(description) => setDescription(description)}
+                        style={styles.textInput}
+                    />
+
+                </View>
+                {tags.map((input, index) => (
+                    <View style={[{ flex: 1 }]} key={index}>
+                        <TouchableOpacity onPress={() => removeTextInput(index)}>
+                            <Ionicons name="close-circle-outline" size={24} color="red" />
+                        </TouchableOpacity>
+                        <TextInput
+                            value={input}
+                            placeholder="Tag..."
+                            placeholderTextColor="#000"
+                            onChangeText={(value) => handleTagsInputChange(index, value)}
+                            style={styles.textInput}
+                        />
+                    </View>
+                ))}
+
+                <View style={[{ flex: 1 }]}>
+
+                    <Button
+                        title="Add tags"
+                        onPress={addTextInput}
+                    />
+                </View>
+
+
+
+
+                <View style={[{ flex: 1 }]}>
+                    <Button
+                        title="Create Post"
+                        onPress={async () => {
+                            const token = await getToken();
+                            await PostModel.createPost(title, description, user.id, tags, image, token);
+                        }}
+                    />
+                </View>
             </ScrollView>
         </View>
     )
@@ -110,6 +128,20 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         alignItems: "center",
         justifyContent: 'center',
+    },
+    buttonText: {
+        fontSize: 20,
+        color: "#fff",
+    },
+    button: {
+        backgroundColor: "#000",
+        padding: 10,
+        borderRadius: 5,
+        marginBottom: 10,
+    },
+    imageContainer: {
+        alignItems: "center",
+        justifyContent: "center",
     },
     textInput: {
         width: 300,

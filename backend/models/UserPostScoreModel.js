@@ -60,7 +60,7 @@ export default class UserPostScore extends Model {
         }
     }
 
-    static async maybeLikePosts(similar_users) {
+    static async maybeLikePosts(userId, similar_users) {
         try {
             const result = await UserPostScore.findAll({
                 where: {
@@ -84,6 +84,9 @@ export default class UserPostScore extends Model {
             const recommendPosts = await Post.findAll({
                 where: {
                     id: post_score.map(post => post.postId),
+                    user_id: {
+                        [Sequelize.Op.not]: userId,
+                    }
                 },
                 include: [
                     {

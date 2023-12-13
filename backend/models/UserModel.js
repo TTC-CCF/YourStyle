@@ -51,8 +51,8 @@ export default class User extends Model {
                     id: userId
                 }, 
                 attributes: ['latest_clicked_posts']
-            });
-            return latestClickedPosts.dataValues.latest_clicked_posts;
+           });
+           return latestClickedPosts ? latestClickedPosts.dataValues.latest_clicked_posts : null;
         } catch (error) {
             console.error('Error getting latest clicked posts:', error);
             throw error;

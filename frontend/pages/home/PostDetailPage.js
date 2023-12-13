@@ -20,7 +20,7 @@ export default function PostDetailComponent({route, navigation}) {
             <ScrollView
                 contentContainerStyle={styles.contentContainer}
             >
-                <UserPreview user={post.user} size={{width: Dimensions.get("window").width}} navigation={navigation} />
+                <UserPreview user={post.user} follow={true} size={{width: Dimensions.get("window").width, height: 50}} navigation={navigation} />
                 <Image source={{uri: post.image_url}} style={{width: Dimensions.get("window").width, height: 520}} />
                 <Text style={styles.description}>{post.description}</Text>
                 {user.id === post.user_id && (

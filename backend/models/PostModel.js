@@ -70,12 +70,17 @@ export default class Post extends Model {
         }
     }
 
-    static async listPosts(page, limit, recommendlist = null) {
+    static async listPosts(userId, page, limit, recommendlist = null) {
         const offset = (page - 1) * limit; // Calculate the offset based on the current page
         try {
             let posts;
             if (recommendlist === null) {
                 posts = await Post.findAll({
+                    where: {
+                        user_id: {
+                            [Sequelize.Op.not]: userId,
+                        }
+                    },
                     include: [{
                         model: Tag,
                         as: "tag",
@@ -88,7 +93,10 @@ export default class Post extends Model {
             } else {
                 posts = await Post.findAll({
                     where: {
-                        id: recommendlist, // already paginated
+                        id: recommendlist,
+                        user_id: {
+                            [Sequelize.Op.not]: userId,
+                        }
                     },
                     include: [{
                         model: Tag,
@@ -96,12 +104,9 @@ export default class Post extends Model {
                         attributes: ['name'],
                     }],
                     attributes: ['id', 'user_id', 'title', 'description', 'image_url', 'likes', 'shares'],
-                });
-
-                posts  = posts.sort((a, b) => {
-                    let str_id_a = a.dataValues.id.toString();
-                    let str_id_b = b.dataValues.id.toString();
-                    return recommendlist.indexOf(str_id_a) - recommendlist.indexOf(str_id_b);
+                    order: Sequelize.literal(`FIELD(post.id, ${recommendlist})`),
+                    limit: limit,
+                    offset: offset,
                 });
             }
             return posts;

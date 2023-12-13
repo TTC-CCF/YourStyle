@@ -12,16 +12,15 @@ function RemoveImage(file) {
     fs.unlinkSync(file.path);
 }
 
-async function GetIBRecommendedPosts(post_id, page, limit) {
+async function GetIBRecommendedPosts(post_id) {
     return DataFrame.fromCSV(process.env.ITEM_SIMILAR_MATRIX_PATH)
     .then(async df => {
-        let offset = (page - 1) * limit;
         if (df.listColumns().includes(post_id.toString())) {
-            return df.select(post_id.toString(), "id").sortBy(post_id.toString(), true).select("id").toArray().flat().slice(offset, offset+limit);
+            return df.select(post_id.toString(), "id").sortBy(post_id.toString(), true).select("id").toArray().flat();
         } else {
             post_id = await Post.findOne()
             post_id = post_id.dataValues.id;
-            return df.select(post_id.toString(), "id").sortBy(post_id.toString(), true).select("id").toArray().flat().slice(offset, offset+limit);
+            return df.select(post_id.toString(), "id").sortBy(post_id.toString(), true).select("id").toArray().flat();
         }
     })
 }
@@ -96,11 +95,11 @@ export default class PostController {
             let recommendlist, result;
 
             if (lastedClicked !== null) {
-                recommendlist = await GetIBRecommendedPosts(lastedClicked, page, limit)
-                result = await Post.listPosts(page, limit, recommendlist);
+                recommendlist = await GetIBRecommendedPosts(lastedClicked)
                 console.log(recommendlist);
+                result = await Post.listPosts(userId, page, limit, recommendlist);
             } else {
-                result = await Post.listPosts(page, limit);
+                result = await Post.listPosts(userId, page, limit);
             }
 
             if (result === null || result.length === 0) {
@@ -108,7 +107,7 @@ export default class PostController {
                 return;
             }
 
-            const test_result = await Post.listPosts(page+1, limit);
+            const test_result = await Post.listPosts(userId, page+1, limit);
             if (test_result === null || test_result.length === 0) {
                 res.status(200).json({data: result});
             } else {
@@ -262,7 +261,7 @@ export default class PostController {
 
             const userId = req.params.id;
             const similar_users = await GetUBSimilarUsers(userId);
-            const result = await UserPostScore.maybeLikePosts(similar_users);
+            const result = await UserPostScore.maybeLikePosts(userId, similar_users);
 
 
             if (result === null || result.length === 0) {

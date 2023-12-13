@@ -7,6 +7,10 @@ import SettingsPage from "../pages/home/SettingsPage";
 import OutfitPage from '../pages/eCloset/OutfitPage';
 import ClosetPage from '../pages/eCloset/ClosetPage';
 import CalenderPage from '../pages/eCloset/CalenderPage';
+import UserDetailPage from '../pages/home/UserDetailPage';
+import UpdateUserPage from '../pages/home/UpdateUserPage';
+import EditorPage from '../pages/eCloset/EditorPage';
+import ChooseImagePage from '../pages/eCloset/ChooseImagePage';
 
 export default function HomeNavigator() {
     const Stack = createNativeStackNavigator();
@@ -34,10 +38,25 @@ export default function HomeNavigator() {
                 headerShown: true, 
                 headerTitle: route.params.title
             })} />
+            <Stack.Screen 
+            name="UserDetail" 
+            component={UserDetailPage} 
+            options={({ route }) => ({
+                headerShown: true, 
+                headerTitle: route.params.username
+            })} />
+            <Stack.Screen
+            name="UpdateUser"
+            component={UpdateUserPage}
+            options={{ headerShown: true }}
+            />
             <Stack.Screen name="Settings" component={SettingsPage} options={{ headerShown: true }}/>
-            <Stack.Screen name="Outfit" component={OutfitPage} options={{ headerShown: true }}/>
+            <Stack.Screen name="Outfit" component={OutfitPage} options={{ headerShown: true, headerTitle: "穿搭" }}/>
             <Stack.Screen name="Closet" component={ClosetPage} options={{ headerShown: true }}/>
             <Stack.Screen name="Calender" component={CalenderPage} options={{ headerShown: true }}/>
+            <Stack.Screen name="ChooseImage" component={ChooseImagePage} options={{ headerShown: true, headerTitle: "選擇衣服"}}/>
+            <Stack.Screen name="Editor" component={EditorPage} options={{ headerShown: true, headerTitle: "拼貼穿搭"}}/>
+
 
         </Stack.Navigator>
         

@@ -3,36 +3,56 @@ import { useUser } from "@clerk/clerk-expo";
 import { useEffect, useState } from "react";
 import UserImage from "./UserImage";
 
-export default function UserPreview({ user, size, navigation }) {
-    const { isLoaded, isSignedIn } = useUser();
-    const userInfo = user;
+export default function UserPreview({ user, size, follow, navigation }) {
+    const imageSize = size.height - 5;
+
+    function gotoUserDetailPage() {
+        if (user.username)
+            navigation.navigate("UserDetail", { user: user, username: user.username });
+        else
+            navigation.navigate("UserDetail", { user: user, username: user.firstName + " " + user.lastName });
+    }
 
     return (
-        <TouchableOpacity
-            onPress={() => {
-                navigation.navigate("UserDetail", { user: userInfo });
-            }}
-        >
-            <View style={[styles.container, {width: size.width, height: size.height}]}>
-                
-                <UserImage url={userInfo.imageUrl} size={{width: 30, height: 30, borderRadius: 15}} />
+        <>
+            <View style={[styles.container, { width: size.width, height: size.height }]}>
+                <View style={[styles.block, { flex: 4 }]}>
+                    <TouchableOpacity style={styles.userBlock} onPress={() => gotoUserDetailPage()}>
+                        <UserImage url={user.imageUrl} size={{ width: imageSize, height: imageSize, borderRadius: imageSize / 2 }} />
 
-                {userInfo.username === null ? (
-                    <Text style={styles.username}>{userInfo.firstName} {userInfo.lastName}</Text>
-                ) : (
-                    <Text style={styles.username}>{userInfo.username}</Text>
+                        {user.username === null ? (
+                            <Text style={styles.username}>{user.firstName} {user.lastName}</Text>
+                        ) : (
+                            <Text style={styles.username}>{user.username}</Text>
+                        )}
+                    </TouchableOpacity>
+                </View>
+                {follow && (
+                    <View style={[styles.block, { flex: 1 }]}>
+                        <TouchableOpacity style={styles.followButton}>
+                            <Text>追蹤</Text>
+                        </TouchableOpacity>
+                    </View>
                 )}
             </View>
-        </TouchableOpacity>
+
+        </>
+
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
-        justifyContent: "flex-start",
-        alignItems: "center",
         backgroundColor: "#fff",
+    },
+    block: {
+        alignItems: "flex-start",
+        justifyContent: "center",
+    },
+    userBlock: {
+        flexDirection: "row",
+        alignItems: "center",
     },
     username: {
         padding: 5,
@@ -45,5 +65,13 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: "#eee",
         marginLeft: 10,
+    },
+    followButton: {
+        borderWidth: 1,
+        borderColor: "#eee",
+        borderRadius: 5,
+        alignItems: "center",
+        justifyContent: "center",
+        width: 50,
     }
 });
