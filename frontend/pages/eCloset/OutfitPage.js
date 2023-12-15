@@ -1,70 +1,85 @@
-import { ScrollView, View, Text, Image, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { FlatList, View, Text, ScrollView, Image, Dimensions, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import FloatingButton from "../../components/FloatingButton";
 import ImageContainer from "../../components/ImageContainer";
-import ChooseImagePage from "./ChooseImagePage";
+import { Zoom, createZoomListComponent } from "react-native-reanimated-zoom";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import CarouselComponent from "../../components/CarouselComponent";
 
-export default function OutfitPage({ navigation }) {
+const ZoomFlatList = createZoomListComponent(FlatList);
+
+export default function OutfitPage({ route, navigation }) {
     const [outfit, setOutfit] = useState([]);
 
     useEffect(() => {
-        (async () => {
-            // await AsyncStorage.removeItem('outfit');
-            const status1 = await ImagePicker.requestMediaLibraryPermissionsAsync();
-            const status2 = await ImagePicker.requestCameraPermissionsAsync();
-
-            if (status1.status !== 'granted' || status2.status !== 'granted') {
-                Alert.alert('Permission denied', 'You need to enable permission to access the camera roll.');
-            }
-            await retrieveData();
-        })();
-    }, []);
-
-    async function handleImage() {
-        navigation.navigate("ChooseImage");
-    }
-
-    async function storeData(data) {
-        try {
-            let store;
-            if (outfit.length === 0) 
-                store = [data];
-            else
-                store = [...outfit, data];
-            await AsyncStorage.setItem('outfit', JSON.stringify(data));
-        } catch (e) {
-            console.log(e);
+        retrieveData();
+        return () => {
+            console.log("clean up");
+            setOutfit([]);
         }
+    }, [route.params]);
+    async function handleImage() {
+        navigation.navigate("ChooseClothes");
     }
 
     async function retrieveData() {
         try {
             const value = await AsyncStorage.getItem('outfit');
-
+            console.log(outfit.length)
             if (value !== null) {
-                setOutfit(JSON.parse(value));
+                let _value = JSON.parse(value);
+                setOutfit(_value);
+                console.log(`value length: ${_value.length}`);
+
             }
         } catch (e) {
             console.log(e);
         }
     }
 
+    async function showInfo(id) {
+        Alert.alert('確定刪除?', '', [
+            {
+                text: '確定',
+                onPress: () => { deleteImage(id) }
+            },
+            {
+                text: '取消',
+                onPress: () => console.log('Cancel Pressed'),
+                style: 'cancel',
+            },
+        ]);
+    }
+
+    async function deleteImage(id) {
+        let _outfit = outfit.filter((item) => item.id !== id);
+        setOutfit(_outfit);
+        await AsyncStorage.setItem("outfit", JSON.stringify(_outfit));
+    }
 
     return (
-        <View style={styles.container}>
-            <ScrollView horizontal={true}>
-                {outfit.map((item, index) => (
-                    <View key={index} style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-                        {/* <Text>{item.slice(0, 100)}</Text> */}
-                        <ImageContainer image={item} size={{width:300, height:400}}/>
-                    </View>
-                ))}
-
-            </ScrollView>
+        <GestureHandlerRootView style={styles.container}>
+            <View style={{ height: "80%" }}>
+                <ZoomFlatList
+                    data={outfit}
+                    renderItem={({ item }) => {
+                        return (
+                            <Zoom maximumZoomScale={2}>
+                                <TouchableOpacity onLongPress={() => showInfo(item.id)}>
+                                    <ImageContainer image={item.data} size={{ width: 300, height: 500 }} />
+            
+                                </TouchableOpacity>
+                            </Zoom>
+                        );
+                    }}
+                    horizontal={true}
+                    showsHorizontalScrollIndicator={false}
+                />
+            </View>
             <FloatingButton onPress={handleImage} />
-        </View>
+        </GestureHandlerRootView>
     );
 }
 

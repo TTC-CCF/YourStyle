@@ -18,12 +18,15 @@ function Archieve() {
 }
 
 function UserPosts({ navigation }) {
-    const { isLoaded, isSignedIn, user } = useUser();
+    const { user } = useUser();
     const [posts, setPosts] = useState([]);
 
     useEffect(() => {
-        if (isLoaded) fetchPosts(user.id);
-    }, []);
+        const unsubscribe = navigation.addListener('focus', () => {
+            fetchPosts(user.id);
+        })
+        return unsubscribe;
+    }, [navigation]);
 
     async function fetchPosts(userId) {
         const post = await UserModel.getUserPosts(userId);
@@ -68,8 +71,11 @@ export default function ProfilePage({ navigation }) {
     const [_user, setUser] = useState({});
 
     useEffect(() => {
-        fetchUser();
-    }, []);
+        const unsubscribe = navigation.addListener('focus', () => {
+            fetchUser();
+        })
+        return unsubscribe;
+    }, [navigation]);
 
     async function fetchUser() {
         const result = await UserModel.getUser(user.id);
@@ -78,14 +84,12 @@ export default function ProfilePage({ navigation }) {
 
     async function gotoFollowers() {
         const result = await UserModel.getUserFollowers(user.id);
-        console.log(result);
-        navigation.navigate("Follows", { title: "追蹤者", data: result, actions: ["取消追蹤"] });
+        navigation.navigate("Follows", { title: "粉絲", data: result, action: "移除粉絲" });
     }
 
     async function gotoFollowees() {
         const result = await UserModel.getUserFollowees(user.id);
-        console.log(result);
-        navigation.navigate("Follows", { title: "粉絲", data: result, actions: ["移除粉絲"] });
+        navigation.navigate("Follows", { title: "追蹤者", data: result, action: "取消追蹤" });
     }
 
     function gotoSettings() {

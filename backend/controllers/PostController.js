@@ -6,6 +6,7 @@ import { exec } from 'child_process';
 import { DataFrame } from 'dataframe-js';
 import UserPostScore from '../models/UserPostScoreModel.js';
 import { users } from "@clerk/clerk-sdk-node";
+import LikePost from '../models/LikePostModel.js';
 
 function RemoveImage(file) {
     if (file === undefined) return;
@@ -243,7 +244,26 @@ export default class PostController {
 
             const userId = req.body.userId;
             const postId = parseInt(req.body.postId);
-            await UserPostScore.updateScore(userId, postId, 10);
+
+            await LikePost.likePost(userId, postId);
+
+            res.status(200).json({ message: "Success" });
+        } catch (err) {
+            console.error('Error liking post:', err);
+            res.status(500).json({ message: "Internal Server Error" });
+        }
+    }
+
+    async UnlikeThePost(req, res) {
+        try {
+            if (req.body === undefined || req.body.userId === undefined || req.body.postId === undefined) {
+                res.status(400).json({ message: "Bad Request" });
+                return;
+            }
+
+            const userId = req.body.userId;
+            const postId = parseInt(req.body.postId);
+            await LikePost.unlikePost(userId, postId);
 
             res.status(200).json({ message: "Success" });
         } catch (err) {

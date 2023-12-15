@@ -5,6 +5,8 @@ import UserImage from "./UserImage";
 
 export default function UserPreview({ user, size, follow, navigation }) {
     const imageSize = size.height - 5;
+    const _user = useUser();
+    const currentUser = _user.user;
 
     function gotoUserDetailPage() {
         if (user.username)
@@ -27,7 +29,7 @@ export default function UserPreview({ user, size, follow, navigation }) {
                         )}
                     </TouchableOpacity>
                 </View>
-                {follow && (
+                {follow && currentUser.id !== user.id && (
                     <View style={[styles.block, { flex: 1 }]}>
                         <TouchableOpacity style={styles.followButton}>
                             <Text>追蹤</Text>

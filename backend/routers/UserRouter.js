@@ -10,7 +10,7 @@ router.get('/followers/:id', userController.GetFollowers);
 router.get('/followees/:id', userController.GetFollowees);
 router.post('/create', userController.CreateUser);
 router.post('/follow', userController.FollowUser);
-router.post('/unfollow/:id', userController.UnfollowUser);
+router.post('/unfollow', userController.UnfollowUser);
 router.put('/height', userController.UpdateUserHeight);
 router.delete('/:id', userController.DeleteUser);
 

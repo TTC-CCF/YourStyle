@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Button, TouchableOpacity, TextInput, Image, ScrollView } from "react-native";
+import { Text, View, StyleSheet, Button, TouchableOpacity, TextInput, Image, Keyboard, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import PostModel from "../../models/PostModel";
 import * as ImagePicker from 'expo-image-picker';
@@ -6,7 +6,7 @@ import { useUser, useAuth } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 
 
-export default function Post() {
+export default function Post({ navigation }) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [image, setImage] = useState(null);
@@ -68,6 +68,8 @@ export default function Post() {
                 </View>
                 <View style={[{ flex: 1 }]}>
                     <TextInput
+                        onBlur={() => { Keyboard.dismiss() }}
+                        multiline
                         value={description}
                         placeholder="Description..."
                         placeholderTextColor="#000"
@@ -106,11 +108,14 @@ export default function Post() {
                     <Button
                         title="Create Post"
                         onPress={async () => {
-                            const token = await getToken();
+                            navigation.navigate("Profile");
                             await PostModel.createPost(title, description, user.id, tags, image, token);
+                            const token = await getToken();
+
                         }}
                     />
                 </View>
+                <View style={{ height: 400 }}></View>
             </ScrollView>
         </View>
     )
@@ -124,7 +129,6 @@ const styles = StyleSheet.create({
         marginBottom: 5,
     },
     container: {
-        flex: 1,
         backgroundColor: "#fff",
         alignItems: "center",
         justifyContent: 'center',

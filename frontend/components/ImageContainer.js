@@ -1,7 +1,6 @@
 import { Image, StyleSheet, View } from "react-native";
-import { useState } from "react";
 
-export default function ImageContainer ({ image, size}) {
+export default function ImageContainer({ image, size }) {
 
     return (
         <View>
@@ -9,7 +8,7 @@ export default function ImageContainer ({ image, size}) {
                 source={{ uri: image }}
                 style={size}
             />
-            
+
         </View>
     );
 }

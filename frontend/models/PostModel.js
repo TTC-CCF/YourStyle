@@ -131,5 +131,45 @@ export default class PostModel {
         }
     }
 
+    static async likePost(postId, userId) {
+        try {
+            let response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/post/like`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    postId,
+                    userId,
+                }),
+            });
+            let json = await response.json();
+            console.log(json);
+            return json;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    static async unlikePost(postId, userId) {
+        try {
+            let response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/post/unlike`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    postId,
+                    userId,
+                }),
+            });
+            let json = await response.json();
+            console.log(json);
+            return json;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
 }
 

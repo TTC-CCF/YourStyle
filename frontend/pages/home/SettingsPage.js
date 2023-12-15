@@ -20,7 +20,7 @@ const SignOut = () => {
 
 const DeleteAccount = () => {
     const { isLoaded, signOut } = useAuth();
-    const { _, isSignedIn, user } = useUser();
+    const { user } = useUser();
 
     async function deleteAccount() {
         Alert.alert('刪除帳號', '真的要刪除嗎?', [
@@ -42,7 +42,7 @@ const DeleteAccount = () => {
         return null;
     }
     return (
-        <Button onPress={deleteAccount} title="刪除帳號" backgroundColor="#FF0000" textColor="#fff" />
+        <Button onPress={deleteAccount} title="刪除帳號" backgroundColor="#f31" textColor="#fff" />
     );
 
 }

@@ -10,7 +10,8 @@ import CalenderPage from '../pages/eCloset/CalenderPage';
 import UserDetailPage from '../pages/home/UserDetailPage';
 import UpdateUserPage from '../pages/home/UpdateUserPage';
 import EditorPage from '../pages/eCloset/EditorPage';
-import ChooseImagePage from '../pages/eCloset/ChooseImagePage';
+import ChooseClothesPage from '../pages/eCloset/ChooseClothesPage';
+import ChooseOutfitpage from '../pages/eCloset/ChooseOutfitPage';
 
 export default function HomeNavigator() {
     const Stack = createNativeStackNavigator();
@@ -54,7 +55,8 @@ export default function HomeNavigator() {
             <Stack.Screen name="Outfit" component={OutfitPage} options={{ headerShown: true, headerTitle: "穿搭" }}/>
             <Stack.Screen name="Closet" component={ClosetPage} options={{ headerShown: true }}/>
             <Stack.Screen name="Calender" component={CalenderPage} options={{ headerShown: true }}/>
-            <Stack.Screen name="ChooseImage" component={ChooseImagePage} options={{ headerShown: true, headerTitle: "選擇衣服"}}/>
+            <Stack.Screen name="ChooseClothes" component={ChooseClothesPage} options={{ headerShown: true, headerTitle: "選擇衣服"}}/>
+            <Stack.Screen name="ChooseOutfit" component={ChooseOutfitpage} options={{ headerShown: true, headerTitle: "選擇衣服"}}/>
             <Stack.Screen name="Editor" component={EditorPage} options={{ headerShown: true, headerTitle: "拼貼穿搭"}}/>
 
 

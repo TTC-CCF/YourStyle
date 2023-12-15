@@ -5,6 +5,7 @@ import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanima
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { captureRef } from 'react-native-view-shot';
 import { useRef } from "react";
+import { v4 as uuidv4 } from 'uuid';
 
 const Cloth = ({ image }) => {
     const translateX = useSharedValue(50);
@@ -43,6 +44,7 @@ const Cloth = ({ image }) => {
 export default function EditorPage({ route, navigation }) {
     const selected = route.params.selected;
     const clothes = route.params.clothes;
+    const dateString = route.params.dateString;
     const imageRef = useRef();
 
     const onSaveImageAsync = async () => {
@@ -51,20 +53,35 @@ export default function EditorPage({ route, navigation }) {
                 result: 'data-uri',
                 quality: 1,
             });
-            
+
             imageContent = imageContent.replace(/(\r|\n)+/g, "");
 
 
             let saved = await AsyncStorage.getItem('outfit');
             if (saved !== null) {
                 saved = JSON.parse(saved);
-                saved = [...saved, imageContent];
+                saved = [...saved, { id: uuidv4(), data: imageContent }];
             } else {
-                saved = [imageContent];
+                saved = [{ id: uuidv4(), data: imageContent }];
             }
 
             await AsyncStorage.setItem('outfit', JSON.stringify(saved));
-            console.log(saved.length)
+
+            if (dateString) {
+                const calendar = await AsyncStorage.getItem('calendar');
+
+                let store = {}
+                if (calendar !== null) {
+                    store = JSON.parse(calendar);
+                    store[dateString] = imageContent;
+                } else
+                    store = { [dateString]: imageContent };
+
+                await AsyncStorage.setItem('calendar', JSON.stringify(store));
+
+                navigation.navigate('Calender', { update: true });
+            } else
+                navigation.navigate('Outfit', { update: true })
 
         } catch (e) {
             console.log(e);
@@ -75,7 +92,7 @@ export default function EditorPage({ route, navigation }) {
     return (
         <GestureHandlerRootView style={styles.container}>
             <View style={styles.imageContainer} collapsable={false}>
-                <View ref={imageRef}  style={{ width: "100%", height: "100%", backgroundColor: "transparent"}}>
+                <View ref={imageRef} style={{ width: "100%", height: "100%", backgroundColor: "transparent" }}>
                     {clothes.map((item, index) => {
                         if (selected.includes(index)) {
                             return (

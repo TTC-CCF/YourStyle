@@ -33,6 +33,16 @@ export default function Homepage({ navigation }) {
         fetchTopUsers();
     }, []);
 
+    function gotoUserDetail(_user) {
+        let navigateTo = "UserDetail";
+        if (user.id === _user.id) navigateTo = "Profile";
+
+        if (_user.username)
+            navigation.navigate(navigateTo, { user: _user, username: _user.username });
+        else
+            navigation.navigate(navigateTo, { user: _user, username: _user.firstName + " " + _user.lastName });
+    }
+
     function onPageLayout(event) {
         const { width, height } = event.nativeEvent.layout;
         setHeight(height);
@@ -68,6 +78,7 @@ export default function Homepage({ navigation }) {
                         size={{width: width, height: height * 0.3}}
                         type={"topUsers"}
                         blocks={users}
+                        onPress={gotoUserDetail}
                         navigation={navigation}
                     />
                 </>

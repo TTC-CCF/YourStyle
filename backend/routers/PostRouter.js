@@ -13,7 +13,8 @@ router.get("/search", postController.SearchPosts);
 router.get("/maybelike/:id", postController.GetMaybeLikePosts);
 router.get("/:id", postController.GetPost);
 router.put("/click", postController.ClickPost);
-router.put("/like", postController.LikeThePost);
+router.post("/like", postController.LikeThePost);
+router.post("/unlike", postController.UnlikeThePost);
 router.delete("/:id", ClerkExpressRequireAuth({ authorizedParties: ['*']}), postController.DeletePost);
 
 export default router;

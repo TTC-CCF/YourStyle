@@ -3,6 +3,7 @@ import { DataTypes, Model, Sequelize } from "sequelize"
 import User from "./UserModel.js"
 import Tag from "./TagModel.js"
 import UserPostScore from "./UserPostScoreModel.js"
+import LikePost from "./LikePostModel.js"
 
 export default class Post extends Model {
     static async createPost(title, description, user_id, tags, image_url) {
@@ -16,17 +17,20 @@ export default class Post extends Model {
                 likes: 0,
                 shares: 0,
             });
-
-            for (const tag of tags) {
-                await Tag.createTag(tag, post.id);
+            
+            if (tags !== undefined && tags.length > 0) {
+                for (const tag of tags) {
+                    await Tag.createTag(tag, post.id);
+                }
             }
+            
 
-            let users = await User.findAll({attributes: ['id']});
+            let users = await User.findAll({ attributes: ['id'] });
             users = users.map(user => user.dataValues.id);
             await UserPostScore.initNewPostScore(post.id, users);
 
             if (transaction) await transaction.commit();
-            
+
             console.log(post);
             return post;
 
@@ -37,7 +41,7 @@ export default class Post extends Model {
             }
             throw err;
         }
-        
+
     }
 
     static async getUserPosts(user_id) {
@@ -50,6 +54,11 @@ export default class Post extends Model {
                     model: Tag,
                     as: "tag",
                     attributes: ['name'],
+                },
+                {
+                    model: LikePost,
+                    as: "likepost",
+                    required: false,
                 }],
                 attributes: ['id', 'title', 'description', 'image_url', 'likes', 'shares', 'user_id'],
             });
@@ -85,6 +94,11 @@ export default class Post extends Model {
                         model: Tag,
                         as: "tag",
                         attributes: ['name'],
+                    },
+                    {
+                        model: LikePost,
+                        as: "likepost",
+                        required: false,
                     }],
                     attributes: ['id', 'user_id', 'title', 'description', 'image_url', 'likes', 'shares'],
                     limit: limit,
@@ -102,6 +116,11 @@ export default class Post extends Model {
                         model: Tag,
                         as: "tag",
                         attributes: ['name'],
+                    },
+                    {
+                        model: LikePost,
+                        as: "likepost",
+                        required: false,
                     }],
                     attributes: ['id', 'user_id', 'title', 'description', 'image_url', 'likes', 'shares'],
                     order: Sequelize.literal(`FIELD(post.id, ${recommendlist})`),
@@ -142,6 +161,11 @@ export default class Post extends Model {
                     model: Tag,
                     as: "tag",
                     attributes: ['name'],
+                },
+                {
+                    model: LikePost,
+                    as: "likepost",
+                    required: false,
                 }],
                 attributes: ['id', 'title', 'description', 'image_url', 'user_id'],
             });
@@ -163,7 +187,7 @@ export default class Post extends Model {
             });
 
             await transaction.commit();
-            
+
             return rowDeleted;
         } catch (error) {
             console.error('Error deleting post:', err);
@@ -218,3 +242,6 @@ Post.init(
 
 Tag.belongsTo(Post, { as: 'tag', foreignKey: 'post_id' });
 Post.hasMany(Tag, { as: 'tag', foreignKey: 'post_id' });
+
+LikePost.belongsTo(Post, { as: 'likepost', foreignKey: 'post_id' });
+Post.hasMany(LikePost, { as: 'likepost', foreignKey: 'post_id' });

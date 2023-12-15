@@ -4,31 +4,40 @@ import ImageContainer from "../../components/ImageContainer";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AntDesign } from '@expo/vector-icons';
 
-export default function ChooseImagePage({ navigation }) {
-    const [closet, setCloset] = useState([]);
+export default function ChooseOutfitpage({ route, navigation }) {
+    const [selected, setSelected] = useState(null);
     const [outfit, setOutfit] = useState([]);
-    const [selected, setSelected] = useState([]);
+    const dateString = route.params.dateString;
 
     useEffect(() => {
+
         retrieveData();
     }, []);
 
     async function handleSelect(idx) {
-        if (selected.includes(idx)) {
-            setSelected(selected.filter(item => item !== idx));
+        if (selected === idx) {
+            setSelected(null);
         } else {
-            setSelected([...selected, idx]);
+            setSelected(idx);
         }
     }
 
     async function storeData(data) {
         try {
-            let store;
-            if (outfit.length === 0)
-                store = [data];
-            else
-                store = [...outfit, data];
-            await AsyncStorage.setItem('outfit', JSON.stringify(data));
+            const calendar = await AsyncStorage.getItem('calendar');
+            let store = {};
+
+            if (calendar !== null) {
+                store = JSON.parse(calendar);
+                store[dateString] = data;
+
+            } else
+                store = { [dateString]: data };
+
+
+            await AsyncStorage.setItem('calendar', JSON.stringify(store));
+
+            navigation.navigate("Calender", { update: true });
         } catch (e) {
             console.log(e);
         }
@@ -36,14 +45,10 @@ export default function ChooseImagePage({ navigation }) {
 
     async function retrieveData() {
         try {
-            const value = await AsyncStorage.getItem('closet');
+            const value = await AsyncStorage.getItem('outfit');
             if (value !== null) {
                 let _value = JSON.parse(value);
-                _value = _value.map(item => {
-                    return item.includes("data:image/png;base64,") ? item : `data:image/png;base64,${item}`;
-                })
-
-                setCloset(_value);
+                setOutfit(_value);
             }
         } catch (e) {
             console.log(e);
@@ -53,26 +58,26 @@ export default function ChooseImagePage({ navigation }) {
     return (
         <View style={styles.container}>
             <View style={[styles.block, { flex: 3 }]}>
-                <View style={{ height: "50%" }}>
+                <View style={{ height: "80%" }}>
                     <ScrollView
                         horizontal={true}
                     >
-                        {closet.map((item, index) => {
+                        {outfit.map((item, index) => {
                             return (
                                 <View key={index}>
                                     {
-                                        selected.includes(index) ? (
+                                        selected === index ? (
                                             <TouchableOpacity
                                                 onPress={() => handleSelect(index)}
                                             >
                                                 <AntDesign name="checkcircle" size={24} color="black" />
-                                                <ImageContainer image={item} size={{ width: 200, height: 200 }} />
+                                                <ImageContainer image={item.data} size={{ width: 300, height: 400 }} />
                                             </TouchableOpacity>
                                         ) : (
                                             <TouchableOpacity
                                                 onPress={() => handleSelect(index)}
                                             >
-                                                <ImageContainer image={item} size={{ width: 200, height: 200 }}/>
+                                                <ImageContainer image={item.data} size={{ width: 300, height: 500 }} />
                                             </TouchableOpacity>
 
                                         )
@@ -86,17 +91,16 @@ export default function ChooseImagePage({ navigation }) {
 
             </View>
             <View style={{ flex: 1 }}>
-                {selected.length > 0 ? (
+                {selected !== null ? (
                     <TouchableOpacity
-                        onPress={() => navigation.navigate("Editor", { selected, clothes: closet })}
+                        onPress={() => storeData(outfit[selected].data)}
+                        style={[styles.button, { width: 200, backgroundColor: "#000" }]}
                     >
-                        <Text>拼貼</Text>
+                        <Text style={{color: "#fff"}}>Pick</Text>
                     </TouchableOpacity>
                 ) : (
 
-                    <View>
-                        <Text>請選擇您的衣服</Text>
-                    </View>
+                    <></>
                 )}
             </View>
 
@@ -113,5 +117,13 @@ const styles = StyleSheet.create({
     block: {
         alignItems: "center",
         justifyContent: "center",
+    },
+    button: {
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+        height: 50,
+        borderRadius: 10,
+        margin: 5,
     }
 })

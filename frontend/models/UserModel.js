@@ -41,6 +41,36 @@ export default class UserModel {
         return data.data === undefined ? [] : data.data;
     }
 
+    static followUser = async (follower_id, followee_id) => {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/user/follow`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                follower_id,
+                followee_id,
+            }),
+        });
+        const data = await response.json();
+        return data;
+    }
+
+    static unfollowUser = async (follower_id, followee_id) => {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/user/unfollow`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                follower_id,
+                followee_id,
+            }),
+        });
+        const data = await response.json();
+        return data;
+    }
+
     static deleteUser = async (id) => {
         const response = await fetch(`${process.env.EXPO_PUBLIC_ENDPOINT}/user/${id}`, {
             method: "DELETE",
