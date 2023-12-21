@@ -70,6 +70,28 @@ export default class UserPostScore extends Model {
                 },
             });
 
+            if (result.length === 0) {
+                const posts = Post.findAll({
+                    where: {
+                        user_id: similar_users,
+                    },
+                    include: [
+                        {
+                            model: Tag,
+                            as: "tag",
+                            attributes: ['name'],
+                        },
+                        {
+                            model: LikePost,
+                            as: "likepost",
+                            required: false,
+                        }
+                    ],
+                });
+                
+                return posts;
+            }
+
             let post_score = [];
             for (const user of similar_users) {
                 let data = result.filter(userPostScore => userPostScore.dataValues.user_id === user);
