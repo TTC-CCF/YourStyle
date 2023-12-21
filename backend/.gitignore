@@ -5,3 +5,4 @@ ai
 *.csv
 .env
 config.json
+mock

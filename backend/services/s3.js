@@ -1,7 +1,5 @@
 import { PutObjectCommand, DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import fs from 'fs';
-import dotenv from 'dotenv';
-dotenv.config();
 
 const S3params = { 
     region: process.env.AWS_REGION,

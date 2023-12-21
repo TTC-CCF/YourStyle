@@ -1,13 +1,12 @@
 import express from "express";
-import UserRouter from "./routers/UserRouter.js";
-import PostRouter from "./routers/PostRouter.js";
-import dotenv from "dotenv";
-
-dotenv.config({ path: "./secret/.env" });
+import "dotenv/config.js"
 
 let app = express();
 
 app.use(express.json());
+
+import UserRouter from "./routers/UserRouter.js";
+import PostRouter from "./routers/PostRouter.js";
 
 app.get("/healthcheck", (req, res) => {
     res.send("OK");
